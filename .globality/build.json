@@ -13,7 +13,7 @@
         "sudo pip install bumpversion",
         "globality-build bump-version"
       ],
-      "repository": "jfrog"
+      "repository": "pypi"
     },
     "test_command": "pytest"
   },
