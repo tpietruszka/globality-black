@@ -1,0 +1,75 @@
+import pandas as pd
+
+def foo(df: pd.DataFrame, graph):
+
+    df = (
+        df
+
+        # turn predictions to bool
+        .assign(predictions=df.predictions.astype(bool))
+
+        # turn predictions to int
+        .assign(predictions=df.predictions.astype(int))
+    )
+
+    # fmt: off
+    graph.use(
+        "logging",
+
+        "space",
+
+        # Sagemaker basics
+        "sagemaker",
+
+        # This line is a comment
+        # another comment
+        "load_active_rice"
+    )
+    # fmt: on
+
+    graph.use(
+        "logging",
+
+        "space",
+
+        # Sagemaker basics
+        "sagemaker",
+
+
+        # comment1
+        # comment2
+        "load_active_rice"
+    )
+
+    # fmt: off
+    df = df.assign(
+        predictions=df.predictions.astype(bool),
+
+
+        # create predictions2
+        predictions2=df.predictions.astype(bool),
+
+
+        predictions3=df.predictions.astype(bool),
+
+
+
+
+
+        predictions4=df.predictions.astype(bool),
+
+
+
+
+
+
+        # comment
+        predictions5=df.predictions.astype(bool),
+    )
+
+    x = [3 for i in range(10) if i < 6]
+    # fmt: on
+
+    x = [3 for i in range(20) if i < 6]
+
+    return df

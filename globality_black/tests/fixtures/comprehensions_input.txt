@@ -1,0 +1,86 @@
+import pandas as pd
+
+
+[3 for _ in range(10)]
+
+[3 for i in range(10) if i < 4]
+
+[3 for i in range(10) if i < 4 if i > 6]
+
+[3 for i in range(10) if i < 4 if i > 6 if i == 3]
+
+{"a": 3 for _ in range(4)}
+
+{"a": 3 for _ in range(4) if i < 4}
+
+
+def get_content_from_container(self, bar, foo):
+
+    candidate = [i for i, f in enumerate(foo) if f.is_foo]
+
+    section = [
+        slice(current, next_hype)
+        for current, next_hype in zip(
+            candidate, candidate[1:] + [max(range(len(foo))) + 1]
+        )
+    ]
+
+
+x = [3 for i in range(10)]
+
+x = [3 for i in range(10) if i < 6]
+
+x = sum(3 for i in range(10))
+
+x = sum(3 for i in range(10) if i < 6)
+
+x = sum([3 for i in range(10) if i < 6])
+
+x = {33 for i in range(44)}
+
+x = {3 for i in range(4) if i < 2}
+
+reader, glo = 4, 5
+
+to_dump = {
+    f"{glo}@{reader.index_path}": bar for foo, bar in glo if reader
+}
+
+
+def foo(a, b):
+    unique = set(text for text, glo in a if glo == b)
+
+
+glo_for_batches = [
+    glo
+    for glo in reader.index
+
+    # comment 1
+    # comment 2
+    if two_comments in prefix
+
+    # comment without new line
+    if len(reader) > 0 and glo in reader
+
+    if glo not in reader
+]
+
+
+pages = []
+to_win = pd.DataFrame(
+    [
+        {"page": rice["salad"], "avocado": rice[pages["salad"]]}
+        for rice in forest
+        if rice["salad"] in rice
+    ]
+)
+
+
+class A:
+    def rice_to_meal(self, row):
+        avocado = [
+            happy
+            for happy, sad in row
+            if happy == self.avocado.value
+            if pd.notnull(sad)
+        ]

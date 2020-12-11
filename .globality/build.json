@@ -1,0 +1,22 @@
+{
+  "params": {
+    "core_packages": "locales git",
+    "name": "globality-black",
+    "pypi": {
+      "enabled": true,
+      "filters": {
+        "branches": {
+          "only": "master"
+        }
+      },
+      "pre_sdist": [
+        "sudo pip install bumpversion",
+        "globality-build bump-version"
+      ],
+      "repository": "jfrog"
+    },
+    "test_command": "pytest"
+  },
+  "type": "python-library",
+  "version": "2020.48.1"
+}

@@ -1,0 +1,92 @@
+impot pandas as pd
+
+def foo(df: pd.DataFrame, graph):
+
+    df = (
+        df
+
+        # turn predictions to bool
+        .assign(predictions=df.predictions.astype(bool))
+
+        # turn predictions to int
+        .assign(predictions=df.predictions.astype(int))
+    )
+
+    # comment
+    graph.use(
+        "logging",
+
+        "sklearn",
+
+        # Sagemaker basics
+        "sagemaker",
+
+        # This line
+        # is split in two
+        "load_dependencies",
+    )
+
+    df = df.assign(
+        predictions=df.predictions.astype(bool),
+
+
+        # create predictions2
+        predictions2=df.predictions.astype(bool),
+
+
+        predictions3=df.predictions.astype(bool),
+
+
+
+
+
+        predictions4=df.predictions.astype(bool),
+
+
+
+
+
+
+        # comment
+        predictions5=df.predictions.astype(bool),
+    )
+
+    return df
+
+
+with pd.option_context("display.max_rows", 200):
+    display(
+        df_to_show
+
+        .reset_index()
+
+        # cut the text
+        # TODO: not sure if this can be done better, but with options doesn't seem to work
+        .assign(
+            box=lambda df: df.box.apply(lambda u: u[:60] + ("..." if len(u) > 60 else "")),
+        )
+
+        .style
+
+        .hide_index()
+
+        # after the formatting, the ints become float, so need to cast them back to int
+        .format("{:,.0f}", subset=["a", "b", "c"])
+    )
+
+
+def foo():
+    return bool(
+            cls.get_dataframe(x, y)
+
+            # this is a comment in
+            # multiple lines
+            .drop_duplicates(["a", "b"], keep=False)
+
+            # get the number of unique pandas for the
+            # world to be saved
+            .groupby("country").pandas.nunique()
+
+            # at least `z` bla bla
+            >= z
+        )
