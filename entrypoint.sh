@@ -27,8 +27,7 @@ elif [ "$1" = "lint" ]; then
    # Install standard linting dependencies; YMMV
    pip --quiet install \
        .[lint] flake8 flake8-print flake8-logging-format flake8-isort
-   # exec flake8 ${NAME}
-   exec globality-black ${NAME} --check
+   exec flake8 ${NAME} && globality-black ${NAME} --check
 elif [ "$1" = "typehinting" ]; then
    # Install standard type-linting dependencies
    pip --quiet install mypy
