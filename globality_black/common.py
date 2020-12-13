@@ -1,6 +1,5 @@
 import re
 from typing import List, Optional
-
 from parso.python.tree import Module
 
 from globality_black.constants import (
