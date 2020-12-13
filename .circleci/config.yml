@@ -23,8 +23,8 @@ defaults: &defaults
         EXTRA_INDEX_URL: "InjectedDuringRuntime"
         AWS_ECR_DOMAIN: "InjectedDuringRuntime"
         JFROG_AUTH: "InjectedDuringRuntime"
-        JFROG_USERNAME: "InjectedDuringRuntime"
-        JFROG_PASSWORD: "InjectedDuringRuntime"
+        PYPI_USERNAME: "InjectedDuringRuntime"
+        PYPI_PASSWORD: "InjectedDuringRuntime"
 
 deploy_defaults: &deploy_defaults
   working_directory: ~/repo
@@ -37,8 +37,8 @@ deploy_defaults: &deploy_defaults
         EXTRA_INDEX_URL: "InjectedDuringRuntime"
         AWS_ECR_DOMAIN: "InjectedDuringRuntime"
         JFROG_AUTH: "InjectedDuringRuntime"
-        JFROG_USERNAME: "InjectedDuringRuntime"
-        JFROG_PASSWORD: "InjectedDuringRuntime"
+        PYPI_USERNAME: "InjectedDuringRuntime"
+        PYPI_PASSWORD: "InjectedDuringRuntime"
 
 
 whitelist: &whitelist
@@ -180,23 +180,7 @@ jobs:
       - run:
           name: Deploy
           command: |
-            echo "[distutils]" > ~/.pypirc
-            echo "index-servers =" >> ~/.pypirc
-            echo "    jfrog " >> ~/.pypirc
-            echo >> ~/.pypirc
-            echo "[jfrog]" >> ~/.pypirc
-            echo "repository:https://globality.jfrog.io/globality/api/pypi/pypi" >> ~/.pypirc
-            echo "username:$JFROG_USERNAME" >> ~/.pypirc
-            echo "password:$JFROG_PASSWORD" >> ~/.pypirc
-            echo >> ~/.pypirc
-            echo >> ~/.pypirc
-            sudo pip install bumpversion
-            globality-build bump-version
-            version=0.${CIRCLE_BUILD_NUM}.dev${CIRCLE_BUILD_NUM}
-            sed  -i '/version \=/s/\".*\"/'"\"${version}\"/" setup.py
-            python setup.py register -r jfrog
-            python setup.py sdist
-            twine upload --repository jfrog dist/globality-black-${version}.tar.gz
+            echo "Not publishing package!"
 
   publish_library:
     <<: *defaults
@@ -208,19 +192,19 @@ jobs:
           command: |
             echo "[distutils]" > ~/.pypirc
             echo "index-servers =" >> ~/.pypirc
-            echo "    jfrog " >> ~/.pypirc
+            echo "    pypi " >> ~/.pypirc
             echo >> ~/.pypirc
-            echo "[jfrog]" >> ~/.pypirc
-            echo "repository:https://globality.jfrog.io/globality/api/pypi/pypi" >> ~/.pypirc
-            echo "username:$JFROG_USERNAME" >> ~/.pypirc
-            echo "password:$JFROG_PASSWORD" >> ~/.pypirc
+            echo "[pypi]" >> ~/.pypirc
+            echo "repository:https://upload.pypi.org/legacy/" >> ~/.pypirc
+            echo "username:$PYPI_USERNAME" >> ~/.pypirc
+            echo "password:$PYPI_PASSWORD" >> ~/.pypirc
             echo >> ~/.pypirc
             sudo pip install bumpversion
             globality-build bump-version
             version=$(cat .bumpversion.cfg | awk '/current_version / {print $3}')
-            python setup.py register -r jfrog
+            python setup.py register -r pypi
             python setup.py sdist
-            twine upload --repository jfrog dist/globality-black-${version}.tar.gz
+            twine upload --repository pypi dist/globality-black-${version}.tar.gz
 
 
 workflows:
