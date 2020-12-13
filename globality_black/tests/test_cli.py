@@ -53,7 +53,7 @@ def test_cli_file(runner: CliRunner, check: bool, file_condition: FileCondition)
         shutil.copy(str(fixture_input_path), str(input_path))
 
         result = run_globality_black(runner, input_path, check)
-        expected_exit_code = (1 if has_errors or check and needs_gb else 0)
+        expected_exit_code = 1 if has_errors or check and needs_gb else 0
         assert result.exit_code == expected_exit_code
 
         emoji = OH_NO_STRING if expected_exit_code == 1 else ALL_DONE_STRING
@@ -144,7 +144,7 @@ def test_cli_directory(runner: CliRunner, check: bool, error: bool):
             filenames_in_temp.append(filename_in_temp)
 
         result = run_globality_black(runner, temp_path, check)
-        expected_exit_code = (1 if check or error else 0)
+        expected_exit_code = 1 if check or error else 0
         assert result.exit_code == expected_exit_code
 
         for filename_in_temp, filename, to_subdir, condition in zip(

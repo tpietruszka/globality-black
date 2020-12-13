@@ -8,7 +8,7 @@ from globality_black.tests.fixtures import get_fixture_path
 
 @pytest.mark.parametrize(
     "feature",
-    ["blank_lines", "fmt_off", "comprehensions"]
+    ["blank_lines", "fmt_off", "comprehensions"],
 )
 def test_reformat_text(feature):
 
