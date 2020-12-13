@@ -45,6 +45,7 @@ setup(
             "flake8-isort>=3.0.1",
             "flake8-print>=3.1.0",
             "flake8-logging-format",
+            "globality-black",
         ],
         "test": [
             "pytest",
