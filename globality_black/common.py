@@ -1,6 +1,5 @@
 import re
 from typing import List, Optional
-
 from parso.python.tree import Module
 
 from globality_black.constants import (
@@ -91,8 +90,7 @@ def find_indentation_parent_prefix(element):
     return leaf.prefix
 
 
-def get_indent_from_prefix(
-        prefix):
+def get_indent_from_prefix(prefix):
     """
     Each element in parso has a prefix. We want to get the indent from the parent, so we can
     construct the prefix for the modified elements.
