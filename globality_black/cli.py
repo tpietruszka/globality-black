@@ -54,8 +54,8 @@ def main(path, check):
 
     parallelize = len(paths) > NUM_FILES_TO_ENABLE_PARALLELIZATION
     if parallelize:
-        pool = mp.Pool(mp.cpu_count() - 1)
-        map_result = pool.imap(process_path_with_check, paths)
+        with mp.Pool(mp.cpu_count() - 1) as pool:
+            map_result = pool.map(process_path_with_check, paths)
     else:
         # Do not parallelize if just a few files
         map_result = map(process_path_with_check, paths)
@@ -64,9 +64,6 @@ def main(path, check):
         click.echo(message)
         reformatted_count += is_modified
         failed_count += is_failed
-
-    if parallelize:
-        pool.close()
 
     unchanged_count = len(paths) - reformatted_count - failed_count
 
