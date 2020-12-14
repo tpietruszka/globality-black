@@ -39,7 +39,7 @@ class SyntaxTreeVisitor:
 
         if not any(name in node.type for name in TYPES_TO_CHECK_FMT_ON_OFF):
             return
-        prefix = self.module.get_leaf_for_position(node.start_pos).prefix
+        prefix = node.get_first_leaf().prefix
 
         if "fmt: off" in prefix:
             self.fmt_off = True
@@ -52,9 +52,8 @@ def apply_function_to_tree_prefixes(module, root, function):
     visitor = SyntaxTreeVisitor(module)
 
     for node in visitor(root):
-        pos = node.start_pos
-        prefix = module.get_leaf_for_position(pos).prefix
-        module.get_leaf_for_position(pos).prefix = function(prefix)
+        prefix = node.get_first_leaf().prefix
+        node.get_first_leaf().prefix = function(prefix)
 
 
 def find_indentation_parent_prefix(element):

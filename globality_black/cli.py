@@ -8,7 +8,11 @@ from typing import Tuple
 import click
 
 from globality_black.black_handler import get_black_mode
-from globality_black.constants import ALL_DONE_STRING, OH_NO_STRING
+from globality_black.constants import (
+    ALL_DONE_STRING,
+    NUM_FILES_TO_ENABLE_PARALLELIZATION,
+    OH_NO_STRING,
+)
 from globality_black.reformat_text import BlackError, reformat_text
 
 
@@ -48,14 +52,18 @@ def main(path, check):
     reformatted_count, failed_count = 0, 0
     process_path_with_check = partial(process_path, check_only_mode=check)
 
-    with mp.Pool(mp.cpu_count() - 1) as pool:
-        for is_modified, is_failed, message in pool.imap(
-            process_path_with_check,
-            paths,
-        ):
-            click.echo(message)
-            reformatted_count += is_modified
-            failed_count += is_failed
+    parallelize = len(paths) > NUM_FILES_TO_ENABLE_PARALLELIZATION
+    if parallelize:
+        with mp.Pool(mp.cpu_count() - 1) as pool:
+            map_result = pool.map(process_path_with_check, paths)
+    else:
+        # Do not parallelize if just a few files
+        map_result = map(process_path_with_check, paths)
+
+    for is_modified, is_failed, message in map_result:
+        click.echo(message)
+        reformatted_count += is_modified
+        failed_count += is_failed
 
     unchanged_count = len(paths) - reformatted_count - failed_count
 

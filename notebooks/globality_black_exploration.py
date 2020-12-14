@@ -1,22 +1,24 @@
 # ---
 # jupyter:
 #   jupytext:
+#     cell_metadata_filter: incorrectly_encoded_metadata,-execution
 #     formats: ipynb,py:percent
 #     text_representation:
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.4.2
+#       jupytext_version: 1.6.0
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python [conda env:play]
 #     language: python
-#     name: python3
+#     name: conda-env-play-py
 # ---
 
 # %% [markdown]
 # This is just an exploration notebook to experiment with parso and help in development of new
 # features
-
+#
+# %%
 import re
 from ast import dump, parse
 from copy import deepcopy
@@ -27,15 +29,16 @@ from parso.normalizer import Normalizer
 from parso.python.tree import Function
 
 
-# %% [markdown]
-# # NEW
-
 # %%
 path = "sample.py"
+path = "../globality_black/tests/fixtures/comprehensions_input.txt"
 
 # %%
 file_contents = Path(path).read_text()
 module = parso.parse(file_contents)
+
+# %%
+module
 
 # %%
 output = module.get_code()
@@ -44,11 +47,23 @@ print(file_contents == output)
 print(output[:90])
 
 # %%
-x = module.children[0].get_params()[0]
+x = module.children[0]
 x
 
 # %%
-module.get_leaf_for_position(x.start_pos)
+x.prefix
+
+# %%
+x.get_first_leaf()
+
+# %%
+x.children[0].children[0].prefix
+
+# %%
+y = module.get_leaf_for_position(x.start_pos)
+
+# %%
+y.prefix
 
 # %%
 x.get_first_leaf()
