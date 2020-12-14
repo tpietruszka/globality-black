@@ -48,7 +48,8 @@ class SyntaxTreeVisitor:
             self.fmt_off = False
 
 
-def apply_function_to_tree_prefixes(module, root, function):
+def apply_function_to_tree_prefixes(
+        module, root, function):
     visitor = SyntaxTreeVisitor(module)
 
     for node in visitor(root):
