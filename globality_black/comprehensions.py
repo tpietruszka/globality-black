@@ -37,9 +37,10 @@ def reformat_comprehension(comp_for: PythonNode):
     )
     ends_with_if = comp_for.children[-1].type == ParsoTypes.COMP_IF.value
     ends_with_for = comp_for.children[-1].type == ParsoTypes.SYNC_COMP_FOR.value
-    # TODO: add more cases to ignore. Look at known_failed_comprehensions
+    has_ternary_operator = comp_for.parent.children[0].type == ParsoTypes.TERNARY_EXPRESSION.value
+    # TODO: add more cases to ignore or to explode. Look at known_failed_comprehensions
 
-    if (is_dict or ends_with_if) and not ends_with_for:
+    if (is_dict or ends_with_if or has_ternary_operator) and not ends_with_for:
         _reformat_comprehension(comp_for)
 
 
