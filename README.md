@@ -30,13 +30,14 @@ graph.use(
 )
 ```
 
-`globality-black` protects those for the sake of readability. 
+`globality-black` protects those assuming the developer added them for readability. 
 
 ### Comprehensions 
 
 Explode comprehensions
 * all dict comprehensions
 * any comprehension with an if
+* list / set comprehensions where the element has a ternary operator (see examples below)
 
 For everything else, we rely on `black`. Examples:
 
@@ -50,6 +51,8 @@ For everything else, we rely on `black`. Examples:
 {"a": 3 for _ in range(4)}
 
 {"a": 3 for _ in range(4) if i < 4}
+
+["odd" if i %% 2 == 0 else "even" for _ in range(10)]
 ```
 
 #### After globality-black 
@@ -73,6 +76,11 @@ For everything else, we rely on `black`. Examples:
     for _ in range(4)
     if i < 4
 }
+
+[
+    "odd" if i %% 2 == 0 else "even" 
+    for _ in range(10)
+]
 ```
 
 
@@ -98,9 +106,4 @@ See `known_failed_comprehensions` for more examples.
 
 Pending / Future work
 ------------
-* Open-source the package
-* Add CODE_OWNERS to the repo
-* Improve speed. It takes 10-20s to run in some of our repos
-* Explode other specific types of comprehensions, e.g. comprehensions with a
-ternary operator
 * Fix known_failures, mainly to cover all comprehensions

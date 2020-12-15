@@ -17,3 +17,4 @@ class ParsoTypes(Enum):
     DICTORSETMAKER = "dictorsetmaker"
     COMP_IF = "comp_if"
     SYNC_COMP_FOR = "sync_comp_for"
+    TERNARY_EXPRESSION = "test"

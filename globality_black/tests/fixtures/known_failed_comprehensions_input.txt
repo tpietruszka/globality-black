@@ -31,5 +31,3 @@ def get_dataframe(
         ),
         columns=["a", "b", "water"],
     )
-
-[0 if foo else 1 for foo in bar]
