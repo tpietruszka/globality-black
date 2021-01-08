@@ -92,3 +92,15 @@ x = {3 + 2 if True else 2 for i in range(4567)}
 x = [5 if True else 7 for i in range(4567)]
 
 x = [5 if True else 7 for i in range(4567) if 5 < 8]
+
+double_comp = [4*i*j for j in range(7) for i in range(3)]
+
+double_comp = [4*i*j for j in range(7) for i in range(3) if j < 4 if i < 2]
+
+double_comp = [[i for i in range(7) if i < 5] for j in range(10)]
+
+double_comp = [[i for i in range(7) if i < 5] for j in range(10) if i < 2]
+
+double_comp = [{i for i in range(7) if i < 5} for j in range(10) if i < 2]
+
+double_comp = {i: [i for i in range(7) if i < 5] for j in range(10) if i < 2}
