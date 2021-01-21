@@ -2,7 +2,7 @@ Globality black
 ===============
 
 
-A wrapper for black, adding pre- and post-processing 
+A wrapper for [black](https://github.com/psf/black), adding pre- and post-processing 
 to better align with Globality conventions.
 
 `globality-black` performs the following steps:
@@ -11,6 +11,7 @@ to better align with Globality conventions.
  - black
  - postprocessing: to revert / correct black actions.
  
+Note: if you are not familiar with black (or need a refresh), please read our [Black refresh](#black-refresh).
 
 Features
 --------
@@ -137,3 +138,24 @@ Pending / Future work
 ------------
 
 All done! Please give us feedback if you find any issues
+
+
+Black refresh
+--------
+
+`black` is an opinionated python formatter that tries to save as much vertical space as possible. With
+that purpose, it compresses lines to the maximum character length that has been configured. `black`'s
+default is 88, whereas in `globality-black` we use a default of 100 characters, as agreed for 
+Globality repos globally. If you want to have a custom max character length, add a `pyproject.toml`
+file at root of your repo. This works the same way as in `black`, and `globality-black` will take
+your config from there.
+
+See how `black` works in their [README](https://github.com/psf/black), 
+especially [here](https://github.com/psf/black/blob/master/docs/the_black_code_style.md).
+
+### Magic comma
+ 
+`black` added a feature at the end of 2020 called by some the "magic comma". It's one of the first
+examples where `black` is giving a bit of freedom to the developer on how the final code will look
+like (apart from `fmt:off` and `fmt:on` to ignore `black` entirely). Read more about it 
+[here](https://github.com/psf/black/blob/master/docs/the_black_code_style.md#the-magic-trailing-comma).
