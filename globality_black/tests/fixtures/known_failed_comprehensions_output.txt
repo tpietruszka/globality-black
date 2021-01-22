@@ -1,6 +1,10 @@
-# this one is partially covered. We explode every comprehension having as value a comprehension,
-# but do not explode the inner comprehension (yet). This requires big changes. As it's not really
-# frequent, let's use `#fmt: off/on` for now
+# We don't have full coverage of nested comprehensions. See below for a couple of non-covered
+# examples.
+# While do explode every comprehension that contains an inner comprehension,
+# we do not explode the inner comprehension itself. This requires big changes, but it's usually ok
+# what we're doing now.
+# If you really would like to explode the inner comprehension, feel free to
+# use the `#fmt: off/on` feature
 x = [
     [
         i
@@ -10,7 +14,7 @@ x = [
     for j in range(10)
 ]
 
-x = [
+food = [
     [
         get_food(self)
         for i in range(4)
