@@ -32,6 +32,8 @@ def reformat_comprehension(comp_for: PythonNode):
         - comprehension inside of comprehension (the inner one will be kept as is)
         - if multiple for's, the first one already explodes the rest
         (with `set_prefix_for_all_last_children`), so they are ignored
+        Example: Given [i for i in range(4) for j in range(6)], i-for contains the j-for as
+        children, so we can ignore the j-for because the i-for will already explode it
     """
 
     assert comp_for.type == ParsoTypes.SYNC_COMP_FOR.value
@@ -99,7 +101,7 @@ def set_prefix(element: PythonNode, prefix: str):
 def set_prefix_for_all_last_children(comp_for: PythonNode, prefix: str):
     """
     indent for in comprehension + all for and if underneath
-    unfortunately parso treates each new comp_for and comp_if after the comp_for (if any) as a child
+    unfortunately parso treats each new comp_for and comp_if after the comp_for (if any) as a child
     of the
     previous one. Hence, we need to recursively iterate on them
 
