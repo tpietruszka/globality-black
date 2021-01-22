@@ -1,6 +1,6 @@
 # this one is partially covered. We explode every comprehension having as value a comprehension,
-# but do not explode the inner comprehension (yet). This requires big changes, as it's not really
-# frequent, so let's use #fmt: off/on for now
+# but do not explode the inner comprehension (yet). This requires big changes. As it's not really
+# frequent, let's use `#fmt: off/on` for now
 x = [[i for i in range(8) if i < 4] for j in range(10)]
 
 x = [[get_food(self) for i in range(4) if i < 4] for j in range(10)]

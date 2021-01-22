@@ -1,6 +1,6 @@
 # this one is partially covered. We explode every comprehension having as value a comprehension,
-# but do not explode the inner comprehension (yet). This requires big changes.
-# As it's not really frequent, and not always the most readable solution let's use #fmt: off/on
+# but do not explode the inner comprehension (yet). This requires big changes. As it's not really
+# frequent, let's use `#fmt: off/on` for now
 x = [
     [
         i
