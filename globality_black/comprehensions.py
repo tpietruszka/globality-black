@@ -29,11 +29,12 @@ def reformat_comprehension(comp_for: PythonNode):
         - there are multiple for's
 
     We don't explode:
-        - comprehension inside of comprehension (the inner one will be kept as is)
+        - comprehension inside of comprehension (the inner one will be kept as is), see README for
+        an example
         - if multiple for's, the first one already explodes the rest
         (with `set_prefix_for_all_last_children`), so they are ignored
         Example: Given [i for i in range(4) for j in range(6)], i-for contains the j-for as
-        children, so we can ignore the j-for because the i-for will already explode it
+        children, so we can ignore the j-for because it will already be exploded once we reach it
     """
 
     assert comp_for.type == ParsoTypes.SYNC_COMP_FOR.value
