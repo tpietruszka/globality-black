@@ -18,3 +18,4 @@ class ParsoTypes(Enum):
     COMP_IF = "comp_if"
     SYNC_COMP_FOR = "sync_comp_for"
     TERNARY_EXPRESSION = "test"
+    LISTCOMP = "testlist_comp"
