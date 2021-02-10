@@ -100,15 +100,15 @@ class A:
         )
 
 
-def is_valid_node(node):
+def is_valid_food(food):
     return (
-        node.tag not in ELEMENTS_TO_REMOVE
+        food.ingredient not in INGREDIENTS_TO_REMOVE
 
-        # remove any hidden text
-        and not node.get("aria-hidden")
-        and not node.get("type") == "hidden"
-        and node.get("hidden") is None
+        # remove any spicy food
+        and not food.get("spicy")
+        and not food.get("condiment") == "soya"
+        and food.get("extra") is None
 
-        # avoid style="display: none"
-        and read_css_dict(node.get("style")).get("display") != "none"
+        # avoid sauce="none"
+        and sauce is None
     )
