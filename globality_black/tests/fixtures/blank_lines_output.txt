@@ -98,3 +98,17 @@ class A:
             # at least `z` bla bla
             >= z
         )
+
+
+def is_valid_food(food):
+    return (
+        food.ingredient not in INGREDIENTS_TO_REMOVE
+
+        # remove any spicy food
+        and not food.get("spicy")
+        and not food.get("condiment") == "soya"
+        and food.get("extra") is None
+
+        # avoid sauce="none"
+        and sauce is None
+    )
