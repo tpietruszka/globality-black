@@ -19,7 +19,8 @@ from globality_black.reformat_text import BlackError, reformat_text
 @click.command()
 @click.argument("path", type=click.Path(readable=True, writable=True, exists=True))
 @click.option("--check/--no-check", type=bool, default=False)
-def main(path, check):
+@click.option("--verbose/--no-verbose", type=bool, default=False)
+def main(path, check, verbose):
     """
     Run globality-black for a given path
 
@@ -38,6 +39,8 @@ def main(path, check):
 
         Note that when not passing --check, all files not failing will be correctly reformatted
         (i.e. globality-black is independently applied per-file)
+
+        If --verbose not passed (or --no-verbose), only files with errors are shown when check
 
     """
 
@@ -61,7 +64,8 @@ def main(path, check):
         map_result = map(process_path_with_check, paths)
 
     for is_modified, is_failed, message in map_result:
-        click.echo(message)
+        if verbose or not message.startswith("Nothing to do for"):
+            click.echo(message)
         reformatted_count += is_modified
         failed_count += is_failed
 
