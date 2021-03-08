@@ -71,7 +71,7 @@ def main(path, check, verbose):
         map_result = map(process_path_with_check, paths)
 
     for is_modified, is_failed, message in map_result:
-        if verbose or not message.startswith("Nothing to do for"):
+        if verbose or is_modified or is_failed:
             click.echo(message)
         reformatted_count += is_modified
         failed_count += is_failed
