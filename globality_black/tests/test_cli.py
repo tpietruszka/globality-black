@@ -29,8 +29,9 @@ SINGLE_FILE_MAP = {
 
 
 @pytest.mark.parametrize("check", (False, True))
+@pytest.mark.parametrize("verbose", (False, True))
 @pytest.mark.parametrize("file_condition", tuple(FileCondition))
-def test_cli_file(runner: CliRunner, check: bool, file_condition: FileCondition):
+def test_cli_file(runner: CliRunner, check: bool, verbose: bool, file_condition: FileCondition):
     """
     We copy the input file to a temp directory, change the extension to .py and use
     globality-black
@@ -52,7 +53,7 @@ def test_cli_file(runner: CliRunner, check: bool, file_condition: FileCondition)
         input_path = (Path(temp_path) / file_to_test_cli).with_suffix(".py")
         shutil.copy(str(fixture_input_path), str(input_path))
 
-        result = run_globality_black(runner, input_path, check)
+        result = run_globality_black(runner, input_path, check, verbose)
         expected_exit_code = 1 if has_errors or check and needs_gb else 0
         assert result.exit_code == expected_exit_code
 
@@ -66,14 +67,21 @@ def test_cli_file(runner: CliRunner, check: bool, file_condition: FileCondition)
 
         per_file_string, final_count_string = get_strings(check, file_condition)
 
-        pattern = f"{per_file_string} {input_path}.*{emoji}.*1 files {final_count_string}.*"
+        if verbose or needs_gb:
+            pattern = f"{per_file_string} {input_path}.*{emoji}.*1 files {final_count_string}.*"
+        else:
+            pattern = f".*{emoji}.*1 files {final_count_string}.*"
         assert re.match(pattern, result.output, flags=re.DOTALL)
 
 
-def run_globality_black(runner: CliRunner, path: Path, check: bool):
+def run_globality_black(runner: CliRunner, path: Path, check: bool, verbose: bool):
     args = [str(path)]
     if check:
         args.append("--check")
+
+    if verbose:
+        args.append("--verbose")
+
     result = run_and_check(
         runner=runner,
         command_name="globality-black",
@@ -109,7 +117,8 @@ def get_strings(check: bool, condition: FileCondition) -> Tuple[str, str]:
 
 @pytest.mark.parametrize("check", (False, True))
 @pytest.mark.parametrize("error", (False, True))
-def test_cli_directory(runner: CliRunner, check: bool, error: bool):
+@pytest.mark.parametrize("verbose", (False, True))
+def test_cli_directory(runner: CliRunner, check: bool, error: bool, verbose: bool):
     """
     We copy 3 files (one of them already correctly formatted) to a directory. The first one will
     go to the root of the dir whereas the other 2 to a subdir.
@@ -143,7 +152,7 @@ def test_cli_directory(runner: CliRunner, check: bool, error: bool):
             shutil.copy(str(fixture_input_path), str(filename_in_temp))
             filenames_in_temp.append(filename_in_temp)
 
-        result = run_globality_black(runner, temp_path, check)
+        result = run_globality_black(runner, temp_path, check, verbose)
         expected_exit_code = 1 if check or error else 0
         assert result.exit_code == expected_exit_code
 
@@ -167,7 +176,9 @@ def test_cli_directory(runner: CliRunner, check: bool, error: bool):
             # since the reformatting is run in parallel, we cannot guarantee the order of the
             # messages. So we just check the message is somewhere **in** the output
             pre_string, _ = get_strings(check, condition)
-            assert f"{pre_string} {filename_in_temp}" in result.output
+            # only check if verbose=True or something needed for this file
+            if verbose or pre_string != "Nothing to do for":
+                assert f"{pre_string} {filename_in_temp}" in result.output
 
         # check for the end of the message
 

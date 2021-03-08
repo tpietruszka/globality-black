@@ -19,25 +19,35 @@ from globality_black.reformat_text import BlackError, reformat_text
 @click.command()
 @click.argument("path", type=click.Path(readable=True, writable=True, exists=True))
 @click.option("--check/--no-check", type=bool, default=False)
-def main(path, check):
+@click.option("--verbose/--no-verbose", type=bool, default=False)
+# characters \b needed to avoid click reformatting
+# see https://click.palletsprojects.com/en/7.x/documentation/#preventing-rewrapping
+def main(path, check, verbose):
     """
     Run globality-black for a given path
 
-    path:
+    \b
+    * path:
         If path is a directory, apply to all .py files in any subdirectory
-        Otherwise, apply just to the given filename
+        Otherwise, apply just to the given filename.
 
-    check:
-        If --check is passed, do not modify the files and return
-            exit code 1: if any file needs to be reformatted (or fails when applying black)
-            exit code 0: otherwise
-
+    \b
+    * check:
+        If --check is passed, do not modify the files and return:
+            - exit code 1: if any file needs to be reformatted (or fails when applying black)
+            - exit code 0: otherwise
+        \b
         If --check not passed (or --no-check is passed), attempt to reformat all paths returning
             - exit code 1: if any file fails
             - exit code 0: otherwise
-
+        \b
         Note that when not passing --check, all files not failing will be correctly reformatted
         (i.e. globality-black is independently applied per-file)
+
+    \b
+    * verbose:
+        If --verbose not passed (or --no-verbose), only files with errors or to be modified are
+        shown
 
     """
 
@@ -61,7 +71,8 @@ def main(path, check):
         map_result = map(process_path_with_check, paths)
 
     for is_modified, is_failed, message in map_result:
-        click.echo(message)
+        if verbose or is_modified or is_failed:
+            click.echo(message)
         reformatted_count += is_modified
         failed_count += is_failed
 

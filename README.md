@@ -13,6 +13,11 @@ to better align with Globality conventions.
  
 Note: if you are not familiar with black (or need a refresh), please read our [Black refresh](#black-refresh).
 
+Cli
+--------
+
+Please see command line arguments running `globality-black --help`. 
+
 Features
 --------
 
