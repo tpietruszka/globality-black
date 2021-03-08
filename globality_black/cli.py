@@ -20,6 +20,8 @@ from globality_black.reformat_text import BlackError, reformat_text
 @click.argument("path", type=click.Path(readable=True, writable=True, exists=True))
 @click.option("--check/--no-check", type=bool, default=False)
 @click.option("--verbose/--no-verbose", type=bool, default=False)
+# characters \b needed to avoid click reformatting
+# see https://click.palletsprojects.com/en/7.x/documentation/#preventing-rewrapping
 def main(path, check, verbose):
     """
     Run globality-black for a given path
