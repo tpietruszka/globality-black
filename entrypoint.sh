@@ -31,7 +31,7 @@ elif [ "$1" = "lint" ]; then
    exit 0
 elif [ "$1" = "typehinting" ]; then
    # Install standard type-linting dependencies
-   pip install mypy
+   pip --quiet install mypy
    mypy ${NAME} --ignore-missing-imports
 else
    echo "Cannot execute $@"

@@ -11,6 +11,5 @@ globality_black/tests
 !setup.cfg
 !pyproject.toml
 !conftest.py
-!mypy.ini
 **/*.pyc
 **/*~

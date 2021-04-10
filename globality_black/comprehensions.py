@@ -4,13 +4,11 @@ Module to explode comprehensions:
 - all comprehensions with `if`
 
 """
-from parso.python.tree import PythonNode
-
 from globality_black.common import find_indentation_parent_prefix, get_indent_from_prefix
 from globality_black.constants import ParsoTypes
 
 
-def reformat_comprehension(comp_for: PythonNode):
+def reformat_comprehension(comp_for):
     """
     comp_for represents a subset of the comprehension, e.g. in
 
@@ -67,7 +65,7 @@ def find_if_value_is_comprehension(comp):
     return False
 
 
-def _reformat_comprehension(comp_for: PythonNode):
+def _reformat_comprehension(comp_for):
     """
     Here we do the actual reformatting
     """
@@ -85,7 +83,7 @@ def _reformat_comprehension(comp_for: PythonNode):
     set_prefix(comp.parent.children[-1], "\n" + base_indent)
 
 
-def set_prefix(element: PythonNode, prefix: str):
+def set_prefix(element, prefix: str):
 
     leaf = element.get_first_leaf()
 
@@ -99,7 +97,7 @@ def set_prefix(element: PythonNode, prefix: str):
         leaf.prefix = leaf.prefix[:last_eol_position] + prefix
 
 
-def set_prefix_for_all_last_children(comp_for: PythonNode, prefix: str):
+def set_prefix_for_all_last_children(comp_for, prefix: str):
     """
     indent for in comprehension + all for and if underneath
     unfortunately parso treats each new comp_for and comp_if after the comp_for (if any) as a child
