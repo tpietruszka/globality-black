@@ -20,7 +20,7 @@ Usage
 There are two ways to use `globality-black`, via CLI, or importing the library. Next, we show 
 some use cases leveraging those:
 
-### Cli
+### CLI
 
 Please see command line arguments running `globality-black --help`. 
 
@@ -31,7 +31,7 @@ Please see command line arguments running `globality-black --help`.
 To use `globality-black` in PyCharm, go to PyCharm -> Preferences... -> Tools -> External Tools -> Click + symbol 
 to add new external tool.
 
-[img](docs/pycharm-external-tools.png) 
+![img](docs/pycharm-external-tools.png)
 
 Recommended configuration to format the current file:
 * Program: path to `globality-black`, e.g. `/Users/marty-mcfly/miniconda3/envs/gb/bin/globality-black`
@@ -45,14 +45,14 @@ Recommended configuration to check the whole repo (but not formatting it it):
 
 Next, configure a keymap, as in [here](https://www.jetbrains.com/help/pycharm/configuring-keyboard-and-mouse-shortcuts.html).
 
-[img](docs/pycharm-shortcuts.png)
+![img](docs/pycharm-shortcuts.png)
 
 ### Jupyterlab
 
 We can leverage [this](https://jupyterlab-code-formatter.readthedocs.io/en/latest/how-to-use.html#custom-formatter) extension,
 with a custom formatter. Here we explain how to get the following options:
 
-[img](docs/jupyter-lab-new-buttons.png)
+![img](docs/jupyter-lab-new-buttons.png)
 
 
 There are two ways to apply `globality-black`, see left-hand-side, or by clicking on the button next to "Code". We will configure
