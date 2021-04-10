@@ -41,9 +41,6 @@ def reformat_comprehension(comp_for: PythonNode):
 
     comp = comp_for.parent
 
-    if comp is None:
-        return
-
     is_dict = comp.type == ParsoTypes.DICTORSETMAKER.value and comp.children[1] == ":"
     ends_with_if = comp_for.children[-1].type == ParsoTypes.COMP_IF.value
     ends_with_for = comp_for.children[-1].type == ParsoTypes.SYNC_COMP_FOR.value
