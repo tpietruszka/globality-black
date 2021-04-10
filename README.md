@@ -26,13 +26,10 @@ Please see command line arguments running `globality-black --help`.
 
 ### Pycharm
 
-[Source](https://godatadriven.com/blog/partial-python-code-formatting-with-black-pycharm/)
-
 To use `globality-black` in PyCharm, go to PyCharm -> Preferences... -> Tools -> External Tools -> Click + symbol 
 to add new external tool.
 
 ![img](docs/pycharm-external-tools.png)
-
 Recommended configuration to format the current file:
 * Program: path to `globality-black`, e.g. `/Users/marty-mcfly/miniconda3/envs/gb/bin/globality-black`
 * Arguments: `$FilePath$`
