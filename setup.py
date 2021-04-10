@@ -42,6 +42,9 @@ setup(
         "black==20.8b1",
     ],
     extras_require={
+        "jupyter": [
+            "jupyterlab-code-formatter",
+        ],
         "lint": [
             "flake8-isort>=3.0.1",
             "flake8-print>=3.1.0",

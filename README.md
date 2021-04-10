@@ -13,10 +13,102 @@ to better align with Globality conventions.
  
 Note: if you are not familiar with black (or need a refresh), please read our [Black refresh](#black-refresh).
 
-Cli
---------
+
+Usage
+-----
+
+There are two ways to use `globality-black`, via CLI, or importing the library. Next, we show 
+some use cases leveraging those:
+
+### Cli
 
 Please see command line arguments running `globality-black --help`. 
+
+### Pycharm
+
+[Source](https://godatadriven.com/blog/partial-python-code-formatting-with-black-pycharm/)
+
+To use `globality-black` in PyCharm, go to PyCharm -> Preferences... -> Tools -> External Tools -> Click + symbol 
+to add new external tool.
+
+[img](docs/pycharm-external-tools.png) 
+
+Recommended configuration to format the current file:
+* Program: path to `globality-black`, e.g. `/Users/marty-mcfly/miniconda3/envs/gb/bin/globality-black`
+* Arguments: `$FilePath$`
+* Working directory: `$ProjectFileDir$`
+
+Recommended configuration to check the whole repo (but not formatting it it):
+* Program: path to `globality-black`, e.g. `/Users/marty-mcfly/miniconda3/envs/gb/bin/globality-black`
+* Arguments: `. --check`
+* Working directory: `$ProjectFileDir$`
+
+Next, configure a keymap, as in [here](https://www.jetbrains.com/help/pycharm/configuring-keyboard-and-mouse-shortcuts.html).
+
+[img](docs/pycharm-shortcuts.png)
+
+### Jupyterlab
+
+We can leverage [this](https://jupyterlab-code-formatter.readthedocs.io/en/latest/how-to-use.html#custom-formatter) extension,
+with a custom formatter. Here we explain how to get the following options:
+
+[img](docs/jupyter-lab-new-buttons.png)
+
+
+There are two ways to apply `globality-black`, see left-hand-side, or by clicking on the button next to "Code". We will configure
+the extension to make it apply the `isort + globality-black` pipeline when clicking such button.
+
+To do so, install the extension, generate the config for jupyter lab and edit it:
+
+```shell script
+pip install jupyterlab_code_formatter
+jupyter notebook --generate-config
+vim ~/.jupyter/jupyter_notebook_config.py
+```
+
+with the following code:
+
+```python
+from jupyterlab_code_formatter.formatters import SERVER_FORMATTERS
+from globality_black.jupyter_formatter import GlobalityBlackFormatter
+SERVER_FORMATTERS['globality-black'] = GlobalityBlackFormatter(line_length=100)
+```
+
+Then, go to the extension preferences, and add:
+
+```json
+{
+    "preferences": {
+        "default_formatter": {
+            "python": [
+                "isort",
+                "globality-black",
+            ],
+        }
+    },
+    "isort": {            
+           "combine_as_imports": true,
+           "force_grid_wrap": 4,
+           "force_to_top": "true",
+           "include_trailing_comma": true,
+           "known_third_party": ["wandb", "tqdm"],
+           "line_length": 100,
+           "lines_after_imports": 2,
+           "multi_line_output": 3,
+    }
+}
+```
+
+Notes:
+ - The extension is applied to all cells in the notebook. It can be configured to be applied just to 
+ the current cell, if interested.
+ - The extension is applied to each cell in isolation. Hence, if multiple imports appear in different
+ cells, they won't be merged together on top of the notebook. 
+
+
+### VScode
+
+TODO.
 
 Features
 --------
@@ -142,7 +234,9 @@ one-liner.
 Pending / Future work
 ------------
 
-All done! Please give us feedback if you find any issues
+- Usage in VScode  
+
+Please give us feedback if you find any issues
 
 
 Black refresh
