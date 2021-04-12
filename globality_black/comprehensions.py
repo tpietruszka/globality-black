@@ -41,20 +41,24 @@ def reformat_comprehension(comp_for: PythonNode):
 
     assert comp_for.type == ParsoTypes.SYNC_COMP_FOR.value
 
-    comp = comp_for.parent
-
+    # checks for parent
+    comp = cast(PythonNode, comp_for.parent)
     is_dict = comp.type == ParsoTypes.DICTORSETMAKER.value and comp.children[1] == ":"
+    value_is_comprehension = find_if_value_is_comprehension(comp)
+    parent_is_for = comp.type == ParsoTypes.SYNC_COMP_FOR.value
+
+    # check for last child
     last_child = cast(PythonNode, comp_for.children[-1])
     ends_with_if = last_child.type == ParsoTypes.COMP_IF.value
     ends_with_for = last_child.type == ParsoTypes.SYNC_COMP_FOR.value
 
+    # checks for first child
     first_child = cast(PythonNode, comp.children[0])
     value_is_ternary_expression = first_child.type == ParsoTypes.TERNARY_EXPRESSION.value
-    value_is_comprehension = find_if_value_is_comprehension(comp)
 
-    parent_is_for = comp.type == ParsoTypes.SYNC_COMP_FOR.value
+    # check for nested comprehensions
     comprehension_types = (ParsoTypes.DICTORSETMAKER.value, ParsoTypes.LISTCOMP.value)
-    nested_comp = comp.parent.parent.type in comprehension_types
+    nested_comp = cast(PythonNode, comp.parent.parent).type in comprehension_types
 
     requirements = is_dict or ends_with_if or ends_with_for
     requirements = requirements or value_is_ternary_expression or value_is_comprehension
