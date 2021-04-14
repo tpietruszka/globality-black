@@ -17,8 +17,8 @@ Note: if you are not familiar with black (or need a refresh), please read our [B
 Usage
 -----
 
-There are two ways to use `globality-black`, via CLI, or importing the library. Next, we show 
-some use cases leveraging those:
+There are two ways to use `globality-black`, via CLI, or importing the helpers in the library. 
+Next, we show some typical use cases:
 
 ### CLI
 
