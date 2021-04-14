@@ -4,6 +4,8 @@ Module to explode comprehensions:
 - all comprehensions with `if`
 
 """
+from typing import cast
+
 from parso.python.tree import PythonNode
 
 from globality_black.common import find_indentation_parent_prefix, get_indent_from_prefix
@@ -39,17 +41,24 @@ def reformat_comprehension(comp_for: PythonNode):
 
     assert comp_for.type == ParsoTypes.SYNC_COMP_FOR.value
 
-    comp = comp_for.parent
-
+    # checks for parent
+    comp = cast(PythonNode, comp_for.parent)
     is_dict = comp.type == ParsoTypes.DICTORSETMAKER.value and comp.children[1] == ":"
-    ends_with_if = comp_for.children[-1].type == ParsoTypes.COMP_IF.value
-    ends_with_for = comp_for.children[-1].type == ParsoTypes.SYNC_COMP_FOR.value
-    value_is_ternary_expression = comp.children[0].type == ParsoTypes.TERNARY_EXPRESSION.value
     value_is_comprehension = find_if_value_is_comprehension(comp)
-
     parent_is_for = comp.type == ParsoTypes.SYNC_COMP_FOR.value
+
+    # check for last child
+    last_child = cast(PythonNode, comp_for.children[-1])
+    ends_with_if = last_child.type == ParsoTypes.COMP_IF.value
+    ends_with_for = last_child.type == ParsoTypes.SYNC_COMP_FOR.value
+
+    # checks for first child
+    first_child = cast(PythonNode, comp.children[0])
+    value_is_ternary_expression = first_child.type == ParsoTypes.TERNARY_EXPRESSION.value
+
+    # check for nested comprehensions
     comprehension_types = (ParsoTypes.DICTORSETMAKER.value, ParsoTypes.LISTCOMP.value)
-    nested_comp = comp.parent.parent.type in comprehension_types
+    nested_comp = comp.parent.parent.type in comprehension_types  # type: ignore
 
     requirements = is_dict or ends_with_if or ends_with_for
     requirements = requirements or value_is_ternary_expression or value_is_comprehension
@@ -59,7 +68,7 @@ def reformat_comprehension(comp_for: PythonNode):
         _reformat_comprehension(comp_for)
 
 
-def find_if_value_is_comprehension(comp):
+def find_if_value_is_comprehension(comp: PythonNode):
     value = comp.children[0]
     for child in getattr(value, "children", []):
         if child.type == "testlist_comp":
@@ -71,7 +80,7 @@ def _reformat_comprehension(comp_for: PythonNode):
     """
     Here we do the actual reformatting
     """
-    comp = comp_for.parent
+    comp = cast(PythonNode, comp_for.parent)
     prefix = find_indentation_parent_prefix(comp)
     base_indent = get_indent_from_prefix(prefix)
     new_prefix = "\n" + base_indent + " " * 4
@@ -82,7 +91,8 @@ def _reformat_comprehension(comp_for: PythonNode):
     set_prefix_for_all_last_children(comp_for, new_prefix)
 
     # set closing bracket
-    set_prefix(comp.parent.children[-1], "\n" + base_indent)
+    last_child = cast(PythonNode, comp.parent.children[-1])  # type: ignore
+    set_prefix(last_child, "\n" + base_indent)
 
 
 def set_prefix(element: PythonNode, prefix: str):
@@ -110,6 +120,6 @@ def set_prefix_for_all_last_children(comp_for: PythonNode, prefix: str):
 
     set_prefix(comp_for, prefix)
 
-    last_child = comp_for.children[-1]
+    last_child = cast(PythonNode, comp_for.children[-1])
     if last_child.type in {ParsoTypes.COMP_IF.value, ParsoTypes.SYNC_COMP_FOR.value}:
         set_prefix_for_all_last_children(last_child, prefix)
