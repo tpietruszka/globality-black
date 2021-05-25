@@ -40,6 +40,7 @@ setup(
         "parso",
         "pytest>=3",
         "black==20.8b1",
+        "pexpect",
     ],
     extras_require={
         "jupyter": [

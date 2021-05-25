@@ -28,10 +28,17 @@ SINGLE_FILE_MAP = {
 }
 
 
-@pytest.mark.parametrize("check", (False, True))
+# the combination (False, True) is not possible since `diff` assumes `check` to be True
+@pytest.mark.parametrize("check,diff", [(False, False), (True, False), (True, True)])
 @pytest.mark.parametrize("verbose", (False, True))
 @pytest.mark.parametrize("file_condition", tuple(FileCondition))
-def test_cli_file(runner: CliRunner, check: bool, verbose: bool, file_condition: FileCondition):
+def test_cli_file(
+    runner: CliRunner,
+    check: bool,
+    verbose: bool,
+    diff: bool,
+    file_condition: FileCondition,
+):
     """
     We copy the input file to a temp directory, change the extension to .py and use
     globality-black
@@ -53,7 +60,7 @@ def test_cli_file(runner: CliRunner, check: bool, verbose: bool, file_condition:
         input_path = (Path(temp_path) / file_to_test_cli).with_suffix(".py")
         shutil.copy(str(fixture_input_path), str(input_path))
 
-        result = run_globality_black(runner, input_path, check, verbose)
+        result = run_globality_black(runner, input_path, check, verbose, diff)
         expected_exit_code = 1 if has_errors or check and needs_gb else 0
         assert result.exit_code == expected_exit_code
 
@@ -67,20 +74,27 @@ def test_cli_file(runner: CliRunner, check: bool, verbose: bool, file_condition:
 
         per_file_string, final_count_string = get_strings(check, file_condition)
 
+        if diff and needs_gb:
+            # check the diff report is correct
+            diff_output_path = get_fixture_path(file_to_test_cli.replace("input", "diff"))
+            assert diff_output_path.read_text() in get_diff_report(result.output)
         if verbose or needs_gb:
             pattern = f"{per_file_string} {input_path}.*{emoji}.*1 files {final_count_string}.*"
         else:
             pattern = f".*{emoji}.*1 files {final_count_string}.*"
-        assert re.match(pattern, result.output, flags=re.DOTALL)
+        assert re.search(pattern, result.output, flags=re.DOTALL)
 
 
-def run_globality_black(runner: CliRunner, path: Path, check: bool, verbose: bool):
+def run_globality_black(runner: CliRunner, path: Path, check: bool, verbose: bool, diff: bool):
     args = [str(path)]
     if check:
         args.append("--check")
 
     if verbose:
         args.append("--verbose")
+
+    if diff:
+        args.append("--diff")
 
     result = run_and_check(
         runner=runner,
@@ -113,6 +127,13 @@ def get_strings(check: bool, condition: FileCondition) -> Tuple[str, str]:
             final_count_string = "reformatted"
 
     return per_file_string, final_count_string
+
+
+def get_diff_report(output: str) -> str:
+    """
+    Get only the diff component from the report
+    """
+    return "@@".join(output.split("@@")[1:])
 
 
 @pytest.mark.parametrize("check", (False, True))
@@ -152,7 +173,7 @@ def test_cli_directory(runner: CliRunner, check: bool, error: bool, verbose: boo
             shutil.copy(str(fixture_input_path), str(filename_in_temp))
             filenames_in_temp.append(filename_in_temp)
 
-        result = run_globality_black(runner, temp_path, check, verbose)
+        result = run_globality_black(runner, temp_path, check, verbose, diff=False)
         expected_exit_code = 1 if check or error else 0
         assert result.exit_code == expected_exit_code
 

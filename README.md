@@ -105,7 +105,23 @@ Notes:
 
 ### VScode
 
-TODO.
+To use `globality-black` in VScode go to Preferences: Keyboard Shortcuts (JSON) from the Palette (command+shift+p)   
+It will open a file named `keybindings.json`, then add to this file :
+```json
+[
+    {
+        "key": "the shortcut you want (ctrl+b for example)",
+        "command": "workbench.action.terminal.sendSequence",
+        "args": {
+          "text": "globality-black ${file}"
+        }
+    }
+]
+```
+This will allow you to run `globality-black` per file.
+To run `globality-black` to the folder opened in VSCode just replace **file** by **workspaceFolder**.  
+You can also add any arguments supported by the CLI (--check or --diff are recommended to avoid formatting the whole repo)
+
 
 Features
 --------
