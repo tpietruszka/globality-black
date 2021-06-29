@@ -28,8 +28,8 @@ elif [ "$1" = "lint" ]; then
    pip --quiet install \
        .[lint] flake8 flake8-print flake8-logging-format flake8-isort
    flake8 ${NAME} && globality-black ${NAME} --check
-   exit 0
 elif [ "$1" = "typehinting" ]; then
+   pip --quiet install .[typehinting]
    # Install standard type-linting dependencies
    pip --quiet install mypy
    mypy ${NAME} --ignore-missing-imports

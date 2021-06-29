@@ -1,6 +1,14 @@
 {
   "params": {
     "core_packages": "locales git",
+    "entrypoint": {
+      "pre_typehinting_commands": [
+        "pip --quiet install .[typehinting]"
+      ]
+    },
+    "flake8": {
+      "per-file-ignores": "noteboooks/*:T001"
+    },
     "name": "globality-black",
     "pypi": {
       "enabled": true,
@@ -15,8 +23,9 @@
       ],
       "repository": "pypi"
     },
-    "test_command": "pytest"
+    "test_command": "pytest",
+    "use_globality_black": true
   },
   "type": "python-library",
-  "version": "2020.48.1"
+  "version": "2021.21.1"
 }

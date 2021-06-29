@@ -52,6 +52,10 @@ setup(
             "flake8-logging-format",
             "globality-black",
         ],
+        "typehinting": [
+            "mypy",
+            "types-setuptools",
+        ],
         "test": [
             "pytest",
             "pytest-cov",
