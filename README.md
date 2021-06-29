@@ -271,4 +271,4 @@ important recent features are explained.
 `black` added a feature at the end of 2020 that we used to call the "magic comma". It's one of the 
 first examples where `black` is giving a bit of freedom to the developer on how the final code will 
 look like (apart from `fmt:off` and `fmt:on` to ignore `black` entirely). Read more about it 
-[here](https://github.com/psf/black/blob/master/docs/the_black_code_style.md#the-magic-trailing-comma).
+[here](https://github.com/psf/black/blob/main/docs/the_black_code_style/current_style.md#the-magic-trailing-comma).
