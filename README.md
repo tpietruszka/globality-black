@@ -11,7 +11,24 @@ to better align with Globality conventions.
  - black
  - postprocessing: to revert / correct black actions.
  
-Note: if you are not familiar with black (or need a refresh), please read our [Black refresh](#black-refresh).
+Note: if you are not familiar with black (or need a refresh), please 
+read our [Black refresh](#black-refresh).
+
+
+## Table of contents
+1. [Usage](#usage)
+   1. [CLI](#cli)
+   1. [Pycharm](#pycharm)
+   1. [JupyterLab](#jupyterlab)
+   1. [VSCode](#vscode)
+1. [Features](#features)
+   1. [Blank lines](#blank-lines) 
+   1. [Dotted chains](#dotted-chains) 
+   1. [Comprehensions](#comprehensions) 
+   1. [Partially disable Globality Black](#partially-disable-globality-black) 
+1. [Pending / Future work](#pending--future-work)
+1. [Black refresh](#black-refresh)
+   1. [Magic comma](#magic-comma)
 
 
 Usage
@@ -44,7 +61,7 @@ Next, configure a keymap, as in [here](https://www.jetbrains.com/help/pycharm/co
 
 ![img](docs/pycharm-shortcuts.png)
 
-### Jupyterlab
+### JupyterLab
 
 We can leverage [this](https://jupyterlab-code-formatter.readthedocs.io/en/latest/how-to-use.html#custom-formatter) extension,
 with a custom formatter. Here we explain how to get the following options:
@@ -120,7 +137,8 @@ It will open a file named `keybindings.json`, then add to this file :
 ```
 This will allow you to run `globality-black` per file.
 To run `globality-black` to the folder opened in VSCode just replace **file** by **workspaceFolder**.  
-You can also add any arguments supported by the CLI (--check or --diff are recommended to avoid formatting the whole repo)
+You can also add any arguments supported by the CLI (`--check` or `--diff` are recommended to avoid 
+formatting the whole repo)
 
 
 Features
@@ -142,6 +160,31 @@ graph.use(
 ```
 
 `globality-black` protects those assuming the developer added them for readability. 
+
+
+### Dotted chains
+
+In a similar fashion to the "blank lines" feature, "dotted chains" allows to keep the block:
+
+```python
+return (
+    df_field[COLUMNS_PER_FIELD[name]]
+    .dropna(subset=["column"])
+    .reset_index(drop=True)
+    .assign(mapped_type=MAP_DICT[name])
+)
+
+LABELS = set(
+    df[df.labels.apply(len) > 0]
+    .flag.apply(curate)
+    .apply(normalize)
+    .unique()
+)
+```
+
+the same. In this feature, **we don't explode anything** but rather protect code assuming it was 
+written by this in purpose for readability. 
+
 
 ### Comprehensions 
 
@@ -240,14 +283,15 @@ files_to_read = [
 # fmt: on
 ```
 
-Note that by as a default (same as `black`), `globality-black` will write the expression above as a
+Note that as a default (same as `black`), `globality-black` will write the expression above as a
 one-liner.
 
 
 Pending / Future work
 ------------
 
-- Usage in VScode  
+- Explode ternary operators under some criteria
+- Nested comprehensions
 
 Please give us feedback if you find any issues
 

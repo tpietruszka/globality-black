@@ -7,11 +7,11 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.6.0
+#       jupytext_version: 1.10.2
 #   kernelspec:
-#     display_name: Python [conda env:play]
+#     display_name: Python [conda env:gb]
 #     language: python
-#     name: conda-env-play-py
+#     name: conda-env-gb-py
 # ---
 
 # %% [markdown]
@@ -20,12 +20,10 @@
 #
 # %%
 import re
-from ast import dump, parse
-from copy import deepcopy
 from pathlib import Path
 
+import pandas as pd
 import parso
-from parso.normalizer import Normalizer
 from parso.python.tree import Function
 
 
@@ -214,356 +212,146 @@ print(elem.get_code())
 elem.children
 
 # %% [markdown]
-# # Test it !
+# ## Dotted chains
 
-# %%
-file_contents = Path("../tests/fixtures/defs_input.py").read_text()
+# %% tags=[]
+path = "../globality_black/tests/fixtures/dotted_chains_input.txt"
+
+# %% tags=[]
+file_contents = Path(path).read_text()
 module = parso.parse(file_contents)
-# for child in module.children:
-#     if child.type == "funcdef":
-#         correct_prefix_if_magic_comma(child)
-#     if child.type == "classdef":
-#         for method in child.iter_funcdefs():
-#             correct_prefix_if_magic_comma(method)
 
-# with open("output.py", "w") as f:
-#     f.write(module.get_code())
+# %% tags=[]
+output = module.get_code().split("\n")
+print("\n".join(output[:8]))
 
-# %%
-print(module.get_code()[:100])
+# %% tags=[]
+block1 = module.children[1].children[4].children[1].children[0]
+print(block1.get_code())
+block1
 
-# %%
-module.children[0].children[2].children[1]
+# %% tags=[] jupyter={"outputs_hidden": true, "source_hidden": true}
+block2 = module.children[2].children[0]
+print(block2.get_code())
+block2
 
-# %%
-module.children[0].children[2].children[1].get_first_leaf()
+# %% tags=[] jupyter={"outputs_hidden": true, "source_hidden": true}
+block3 = module.children[3]
+print(block3.get_code())
+block3
 
-# %%
-prefix = module.children[0].children[2].children[1].get_first_leaf().prefix
-prefix
+# %% tags=[]
+block1.children
 
-# %%
-re.findall("( *)$", prefix)[0]
+# %% tags=[] jupyter={"source_hidden": true, "outputs_hidden": true}
+block2.children[2].children
 
-# %%
-re.search("( *)$", prefix).group(0)
-
-# %%
-file_contents = Path("../tests/fixtures/calls_input.py").read_text()
-module = parso.parse(file_contents)
-for child in module.children:
-    if child.type == "funcdef":
-        correct_prefix_if_magic_comma(child)
-    if child.type == "classdef":
-        for method in child.iter_funcdefs():
-            correct_prefix_if_magic_comma(method)
-
-with open("output.py", "w") as f:
-    f.write(module.get_code())
-
-# %%
-list(c.iter_funcdefs())
-
-# %%
-cf.get_first_leaf().prefix
+# %% tags=[] jupyter={"outputs_hidden": true, "source_hidden": true}
+block3.children[1]  # .children[1].children[1]
 
 # %% [markdown]
-# # SPEC if magic comma, always explode
+# atom_expr is the types to inspect here
 
-# %%
-# file_contents = Path("sample.py").read_text()
-
-file_contents = """
-x = foo(a=fee(3, 2,), b=5,)
-"""
-module = parso.parse(file_contents)
-print(module.get_code())
+# %% [markdown]
+# ### is_dotted_chain
 
 
-# %%
-def print_children(a):
-    if hasattr(a, "children") and a.children:
-        print()
-        print(f"{a} has children {a.children}")
-        for c in a.children:
-            print_children(c)
-    else:
-        print(a)
+ae1 = block1.children[2].children[1]
+print(ae1.get_code())
+print(ae1.type)
+pd.DataFrame(dict(elem=ae1.children)).assign(
+    code=lambda df: df.elem.apply(lambda e: e.get_code()),
+    _type=lambda df: df.elem.apply(lambda e: type(e).__name__),
+    a_type=lambda df: df.elem.apply(lambda e: e.type),
+    first_leaf_prefix=lambda df: df.elem.apply(lambda e: "'" + e.get_first_leaf().prefix) + "'",
+)
+# pd.Series(ae1).apply(lambda e: e.type)
 
 
-# %%
-print_children(module)
+# %% tags=[]
+def is_dotted_chain(atom_expr):
+    """
+    Assert whether the given atom_expr is a dotted chain
 
-# %%
-s = module.children[0].children[0]
-s
+    Examples:
 
-# %%
-rhs = s.get_rhs()
-rhs
+    batch(a)(b)
+    .sample(
+        frac=param1,
+        rs=param2,
+    )
+    .reset_index(drop1=True)(drop2=True)
+    .reset_index(drop=True).reset_index(drop=True)
+    --> True
 
-# %%
-rhs.children
+    batch
+    (batch)
+    --> False
 
-# %%
-foo = module.children[0]
-print(foo.get_params())
-print(foo.get_params()[0].end_pos)
-foo.get_leaf_for_position((2, 8)), foo.get_leaf_for_position((2, 9)), foo.get_leaf_for_position(
-    (2, 12)
+    batch,
+    batch,
+    --> False
+
+    batch
+    .batch
+    --> True
+
+    batch
+    .batch(
+        x=4,
+    )
+    --> True
+
+    """
+    # print(atom_expr.get_code())
+    # print(atom_expr)
+    children = atom_expr.children
+
+    # first node should start with \n + tabs (sapces multiple of 4)
+    prefix_child1 = children[0].get_first_leaf().prefix
+    if not re.match(r"\n(?:\s{4})+", prefix_child1):
+        return False
+
+    # more than one child needed to be a dotted chain
+    if len(children) < 2:
+        return False
+
+    # all children after the first one that start with \n + tabs should have a . afterwards
+    # otherwise it's not a dotted chain
+    for child in children[1:]:
+        code = child.get_code()
+        if re.match(r"\n(?:\s{4})+", code):
+            if not code.strip().startswith("."):
+                return False
+
+    return True
+
+
+def read_and_turn_to_ae(code):
+    m = parso.parse("labels = (" + code + "\n)")
+    #     breakpoint()
+    return m.children[0].children[2].children[1]
+
+
+print(
+    is_dotted_chain(ae1),
+    is_dotted_chain(read_and_turn_to_ae("\n    batch\n    (batch)")),
+    is_dotted_chain(read_and_turn_to_ae("\n    batch,\n    batch,")),
+    is_dotted_chain(read_and_turn_to_ae("\n    batch\n    .batch")),
+    is_dotted_chain(read_and_turn_to_ae("\n    batch\n    .batch(\n        x=4,\n    )")),
 )
 
-# %%
-foo = module.children[1]
-print(foo.get_params())
-module.get_leaf_for_position((4, 10))
+# %% tags=[]
+type(module.children[0])
 
-# %%
+# %% tags=[]
+re.match(r"\n(?:\s{4})+", ae1.children[0].prefix)
 
-# %%
+# %% tags=[]
+ae1.children[0].get_code()
 
-# %%
+# %% tags=[]
+ae1.children[3].get_code().strip()
 
-# %%
-print(f"{function.name.value}: {repr(function.get_first_leaf().prefix)}")
-
-
-# %%
-class RefactoringNormalizer(Normalizer):
-    def __init__(self, grammar):
-        super(RefactoringNormalizer, self).__init__(grammar, None)
-        self._replaced_leaves = {}
-
-    def replace_leaf(self, leaf, prefix=None, value=None):
-        self._replaced_leaves[leaf] = prefix, value
-
-    def visit_leaf(self, leaf):
-        try:
-            prefix, value = self._replaced_leaves[leaf]
-            return (
-                leaf.prefix if prefix is None else prefix + leaf.value if value is None else value
-            )
-        except KeyError:
-            return leaf.prefix + leaf.value
-
-
-# %%
-
-# %%
-
-# %%
-
-# %%
-grammar = parso.load_grammar()
-module = grammar.parse(file_contents)
-
-# %%
-foo = module.children[0]
-
-
-foo2 = deepcopy(foo)
-
-# %%
-foo2.children.append(foo2.children[-1])
-print(foo2.get_code())
-
-# %%
-pos = foo.get_params()[2].start_pos
-leaf = foo.get_leaf_for_position(pos)
-pos
-
-# %%
-normalizer = RefactoringNormalizer(grammar=grammar)
-# normalizer.replace_leaf(first_leaf)
-# leaf = foo.get_params()[2]
-normalizer.replace_leaf(leaf, prefix="\n\n\n" + leaf.prefix)
-# normalizer.replace_leaf(foo, value=foo2)
-
-
-new_code = normalizer.walk(module)
-
-# %%
-print(new_code)
-
-# %% [markdown]
-# <!-- CHECK IF WE CAN APPEND CHILDREN WITH THE ABOVE CODE -->
-
-# %%
-
-# %%
-
-# %%
-
-# %%
-
-# %% [markdown]
-# # ORIGINAL
-
-# %%
-dump(parse("pokey.py"))
-
-# %%
-file_contents = Path("pokey.py").read_text()
-
-# %%
-module = parso.parse(file_contents)
-
-# %%
-print(module.get_code())
-
-# %%
-output = module.get_code()
-
-# %%
-file_contents == output
-
-# %%
-f = module.children[-2]
-
-# %%
-print(f.get_code())
-
-# %%
-for child in f.children:
-    print(child)
-
-# %%
-print(f.children[4].get_code())
-
-# %%
-f.children[-1]
-
-# %%
-print("".join(node.get_code() for node in f.children[:-1]))
-
-# %%
-f.start_pos
-
-# %%
-[node.start_pos for node in f.children]
-
-# %%
-f.children[2]
-
-# %%
-param_list = f.children[2]
-
-# %%
-[node.start_pos for node in param_list.children]
-
-# %%
-param_list.children[-1]
-
-# %%
-param_list.children[0]
-
-# %%
-param_list.children
-
-# %%
-dir(param_list.children[1])
-
-# %%
-param_list.children[1].get_first_leaf().prefix = "\n\t"
-
-# %%
-param_list.children[1].get_first_leaf().prefix
-
-# %%
-print(param_list.get_code())
-
-# %%
-param_list.parent.get_last_leaf()
-
-# %%
-param_list.type
-
-# %%
-f.get_params()
-
-# %%
-f
-
-# %%
-graph_use = f.children[-1].children[4]
-
-# %%
-trailer = graph_use.children[0].children[2]
-
-# %%
-arglist = trailer.children[1]
-print(arglist.get_code())
-
-# %%
-arglist.children[4].prefix
-
-# %%
-list(module.iter_funcdefs())
-
-
-# %%
-class TypeFinder:
-    def __init__(self, type_to_find):
-        self.type_to_find = type_to_find
-
-    def __call__(self, node):
-        if node.type == self.type_to_find:
-            yield node
-        if hasattr(node, "children"):
-            for child in node.children:
-                yield from self(child)
-
-
-# %%
-trailer_finder = TypeFinder("trailer")
-
-# %%
-arg_finder = TypeFinder("trailer")
-
-# %%
-for node in trailer_finder(module):
-    print(node.get_code())
-
-# %%
-list(trailer_finder(module))[5]
-
-
-# %%
-class WhitespaceInTrailerFinder:
-    def __init__(self):
-        self.trailer_count = 0
-
-    def __call__(self, node):
-        if self.trailer_count > 0:
-            if hasattr(node, "prefix") and "\n\n" in node.prefix:
-                yield node
-        if node.type == "trailer":
-            self.trailer_count += 1
-
-        if hasattr(node, "children"):
-            for child in node.children:
-                yield from self(child)
-
-        if node.type == "trailer":
-            self.trailer_count -= 1
-
-
-# %%
-finder = WhitespaceInTrailerFinder()
-
-# %%
-trailer_descendents_with_empty_line_prefixes = list(finder(module))
-
-# %%
-trailer_descendents_with_empty_line_prefixes
-
-# %%
-[param.get_first_leaf().prefix for param in f.get_params()]
-
-# %%
-trailer_descendents_with_empty_line_prefixes[0].parent.parent.parent.parent.parent
-
-# %%
-next(module.iter_funcdefs()).get_params()[0].get_first_leaf().prefix
-
-# %%
+# %% tags=[]
+ae1[1].children[0]

@@ -9,7 +9,7 @@ from typing import cast
 from parso.python.tree import PythonNode
 
 from globality_black.common import find_indentation_parent_prefix, get_indent_from_prefix
-from globality_black.constants import ParsoTypes
+from globality_black.constants import TAB_CHAR_SIZE, ParsoTypes
 
 
 def reformat_comprehension(comp_for: PythonNode):
@@ -83,7 +83,7 @@ def _reformat_comprehension(comp_for: PythonNode):
     comp = cast(PythonNode, comp_for.parent)
     prefix = find_indentation_parent_prefix(comp)
     base_indent = get_indent_from_prefix(prefix)
-    new_prefix = "\n" + base_indent + " " * 4
+    new_prefix = "\n" + base_indent + " " * TAB_CHAR_SIZE
 
     # indent element of comp
     set_prefix(comp, new_prefix)

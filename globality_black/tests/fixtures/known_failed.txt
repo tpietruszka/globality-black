@@ -1,0 +1,22 @@
+# In some cases, we know globality-black fails, but haven't had the time to prioritise this
+# # Feel free to use the `#fmt: off/on` feature
+
+# 1. We don't have full coverage of nested comprehensions. See below for a couple of non-covered
+# examples.
+# While do explode every comprehension that contains an inner comprehension,
+# we do not explode the inner comprehension itself. This requires big changes, but it's usually ok
+# what we're doing now.
+x = [[i for i in range(8) if i < 4] for j in range(10)]
+
+food = [[get_food(self) for i in range(4) if i < 4] for j in range(10)]
+
+
+# 2. While list comprehensions are exploded if they have an if, ternary operators are not. These
+seem not to complex to cover, but unfortunately the following gets formatted today:
+
+def read_df(path: Path):
+    return (
+         pd.read_excel(path, engine="openpyxl")
+         if path.name.endswith("xlsx")
+         else pd.read_csv(path)
+    ).assign(correction_source=path.name)

@@ -39,7 +39,7 @@ setup(
         "Click>=7.0",
         "parso",
         "pytest>=3",
-        "black==20.8b1",
+        "black==21.7b0",
         "pexpect",
     ],
     extras_require={

@@ -1,0 +1,47 @@
+import pandas as pd
+
+
+return (
+    df_field[COLUMNS_PER_FIELD[name]]
+    .dropna(subset=["column"])
+)
+
+
+return (
+    df_field[COLUMNS_PER_FIELD[name]]
+    .dropna(subset=["column"])
+    .reset_index(drop=True)
+    .assign(mapped_type=MAP_DICT[name])
+)
+
+
+def foo():
+    batch = (
+        batch(a)(b)
+        .sample(
+            frac=param1,
+            rs=param2,
+        )
+        .reset_index(drop1=True)(drop2=True)
+        .reset_index(drop=True).reset_index(drop=True)
+    )
+
+
+LABELS = set(
+    df[df.labels.apply(len) > 0]
+    .flag.apply(curate)
+    .apply(normalize)
+    .unique()
+)
+
+# nested dotted chain
+LABELS = set(
+    df[
+        df
+        .labels
+        .apply(len).gt(0)
+    ]
+    .flag.apply(curate)
+    .apply(normalize)
+    .unique()
+)

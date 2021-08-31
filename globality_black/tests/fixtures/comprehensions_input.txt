@@ -104,3 +104,5 @@ double_comp = [[i for i in range(7) if i < 5] for j in range(10) if i < 2]
 double_comp = [{i for i in range(7) if i < 5} for j in range(10) if i < 2]
 
 double_comp = {i: [i for i in range(7) if i < 5] for j in range(10) if i < 2}
+
+sum(i for i in range(5) if i > 2)
