@@ -29,6 +29,7 @@ read our [Black refresh](#black-refresh).
 1. [Pending / Future work](#pending--future-work)
 1. [Black refresh](#black-refresh)
    1. [Magic comma](#magic-comma)
+1. [FAQ](#faq)
 
 
 Usage
@@ -286,7 +287,6 @@ files_to_read = [
 Note that as a default (same as `black`), `globality-black` will write the expression above as a
 one-liner.
 
-
 Pending / Future work
 ------------
 
@@ -316,3 +316,36 @@ important recent features are explained.
 first examples where `black` is giving a bit of freedom to the developer on how the final code will 
 look like (apart from `fmt:off` and `fmt:on` to ignore `black` entirely). Read more about it 
 [here](https://github.com/psf/black/blob/main/docs/the_black_code_style/current_style.md#the-magic-trailing-comma).
+
+FAQ
+---
+
+Here we list a number of questions and solutions raised when presenting this project to other teams:
+
+**I like this project, but this would destroy all our git history and git blames**
+
+Our recommendation is:
+ 1. Create a big PR for all your repo, and do the effort of reviewing the changes just once.
+ 1. Add a `.git-blame-ignore-revs` file to your repo, ignoring the bulk commit where 
+ `globality-black` is applied. See 
+ [here](https://www.moxio.com/blog/43/ignoring-bulk-change-commits-with-git-blame) 
+ for more details.
+
+**I like most of the changes, but in some places I really prefer the way I write the code**
+
+No problem, for those specific cases where you like more your style, just wrap the block with 
+`fmt:off` and `fmt:on`, see the
+[Partially disable Globality Black](#partially-disable-globality-black) section.
+
+**100 characters per line is too short / too long for me**
+
+Just add a `pyproject.toml` to the root of your repo (as the one in this very own 
+project) and specify your preferred length, see the [Black refresh](#black-refresh) section.
+
+**I want to know what will be changed before applying the changes**
+
+Please use the `--diff` option from the CLI, see the [CLI](#cli) section.
+
+**I want to explode list of arguments, but `globality-black` is compressing them into one line**
+
+Please use the magic comma feature, see [Magic comma](#magic-comma).
