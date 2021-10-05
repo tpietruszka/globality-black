@@ -29,9 +29,8 @@ def cover_blank_lines(module, root):
 
 def add_token_if_line_to_keep(prefix):
     # Add a token when two new lines
-
     return re.sub(
-        r"\n{2}( +)",
+        r"\n{2,}( +)",
         fr"\n# {BLANK_LINE_TOKEN}\n\1",
         prefix,
     )

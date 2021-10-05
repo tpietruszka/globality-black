@@ -112,3 +112,9 @@ def is_valid_food(food):
         # avoid sauce="none"
         and sauce is None
     )
+
+
+def func(arg):
+    arg = 5
+
+    return arg
