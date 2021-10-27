@@ -4,8 +4,14 @@ import parso
 from globality_black.blank_lines import cover_blank_lines, uncover_blank_lines
 from globality_black.common import SyntaxTreeVisitor
 from globality_black.comprehensions import reformat_comprehension
-from globality_black.constants import BLANK_LINES_TYPES, COMPREHENSIONS_TYPES, DOTTED_CHAIN_TYPES
+from globality_black.constants import (
+    BLANK_LINES_TYPES,
+    COMPREHENSIONS_TYPES,
+    DOTTED_CHAIN_TYPES,
+    TUPLE_TYPES,
+)
 from globality_black.dotted_chains import cover_dotted_chain_if_needed, uncover_dotted_chain
+from globality_black.tuples import cover_tuple_if_needed, uncover_tuple
 
 
 class BlackError(Exception):
@@ -27,6 +33,13 @@ def reformat_text(file_contents, black_mode):
     finder = SyntaxTreeVisitor(module, DOTTED_CHAIN_TYPES)
     for element in finder(module):
         cover_dotted_chain_if_needed(element)
+
+    # cover size one tuples
+    # TODO: remove this once/if https://github.com/psf/black/issues/1139#issuecomment-951014094
+    #  solved
+    finder = SyntaxTreeVisitor(module, TUPLE_TYPES)
+    for element in finder(module):
+        cover_tuple_if_needed(element)
 
     # BLACK
 
@@ -54,5 +67,12 @@ def reformat_text(file_contents, black_mode):
     finder = SyntaxTreeVisitor(module, DOTTED_CHAIN_TYPES)
     for element in finder(module):
         uncover_dotted_chain(module, element)
+
+    # cover size one tuples
+    # TODO: remove this once/if https://github.com/psf/black/issues/1139#issuecomment-951014094
+    #  solved
+    finder = SyntaxTreeVisitor(module, TUPLE_TYPES)
+    for element in finder(module):
+        uncover_tuple(module, element)
 
     return module.get_code()

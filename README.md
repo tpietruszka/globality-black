@@ -77,11 +77,14 @@ To do so, install the extension, generate the config for jupyter lab and edit it
 
 ```shell script
 pip install jupyterlab_code_formatter
-jupyter notebook --generate-config
-vim ~/.jupyter/jupyter_notebook_config.py
+jupyter lab --generate-config
+vim ~/.jupyter/jupyter_lab_config.py  # if you already had some config, then use jupyter_notebook_config
 ```
 
-with the following code:
+You might already have some config in `jupyter_notebook_config`. If so, you might want to omit
+ the second command above, and edit `jupyter_notebook_config` instead.
+ 
+In any case, we will add the following code:
 
 ```python
 from jupyterlab_code_formatter.formatters import SERVER_FORMATTERS
@@ -185,6 +188,23 @@ LABELS = set(
 
 the same. In this feature, **we don't explode anything** but rather protect code assuming it was 
 written by this in purpose for readability. 
+
+### Length one tuples
+
+This is a very simple and specific feature. Black (at least up to 21.9b0) has a bug so that tuples 
+with one element are compressed as in
+
+```python
+x = (
+    3,
+)
+```
+becomes
+```python
+x = (3,)
+```
+See https://github.com/psf/black/issues/1139#issuecomment-951014094. With globality-black, 
+will protect these.
 
 
 ### Comprehensions 

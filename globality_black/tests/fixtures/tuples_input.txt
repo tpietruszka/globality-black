@@ -1,0 +1,30 @@
+# in this file we cover other outlier cases
+
+# size 1 tuple exploded. Should stay the same
+x = (
+    3,
+)
+
+# size 1 tuple non-exploded. Should stay the same
+x = (3,)
+
+# size 1+ tuple non-exploded. Should stay the same
+x = (3,4)
+
+# size 1+ tuple non-exploded but with magic comma. Should explode
+x = (3,4,)
+
+
+def func():
+    return
+
+
+func(
+    (3,)
+)
+
+func(
+    (
+        3,
+    )
+)

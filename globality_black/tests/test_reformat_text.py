@@ -13,6 +13,7 @@ from globality_black.tests.fixtures import get_fixture_path
         "fmt_off",
         "comprehensions",
         "dotted_chains",
+        "tuples",
     ],
 )
 def test_reformat_text(feature):
