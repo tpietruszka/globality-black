@@ -77,9 +77,8 @@ def test_cli_file(
         if diff and needs_gb:
             # check the diff report is correct
             expected_diff_output_path = get_fixture_path(file_to_test_cli.replace("input", "diff"))
-            # git diff adds empty lines with one space when there is not difference. They seem to be
-            # compressed when reading the file, so apply same transformation
-            diff_output = get_diff_report(result.output).replace("\n \n", "\n\n")
+            diff_output = get_diff_report(result.output)
+            # we don't check the whole thing since `temp_path` is random
             assert expected_diff_output_path.read_text() in diff_output
         if verbose or needs_gb:
             pattern = f"{per_file_string} {input_path}.*{emoji}.*1 files {final_count_string}.*"

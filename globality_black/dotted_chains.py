@@ -77,7 +77,7 @@ def is_dotted_chain(atom_expr: PythonNode) -> bool:
 
     """
     children = atom_expr.children
-    new_line_and_indent_regex = rf"\n(?:\s{{{TAB_CHAR_SIZE}}})+"
+    new_line_and_indent_regex = rf"\n(?: {{{TAB_CHAR_SIZE}}})+"
 
     # first node should start with a \n (a new line) + tabs (space characters, multiple of 4)
     prefix_child1 = children[0].get_first_leaf().prefix
@@ -114,7 +114,7 @@ def get_new_prefix(prefix):
     # Add a token to avoid line merging
 
     return re.sub(
-        r"\n(\s+)",
+        r"\n( +)",
         fr"\n\1# {DOTTED_CHAIN_TOKEN}\n\1",
         prefix,
     )
@@ -136,7 +136,7 @@ def remove_token_from_covered_dotted_chain_line(prefix):
     # Remove extra lines with DC_TOKEN" added in pre-processing
 
     return re.sub(
-        fr"\n\s+# {DOTTED_CHAIN_TOKEN}",
+        fr"\n +# {DOTTED_CHAIN_TOKEN}",
         r"",
         prefix,
     )

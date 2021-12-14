@@ -1,6 +1,7 @@
 """Helper class to use with `jupyterlab_code_formatter` Jupyter extension. See README for details"""
 
 import logging
+import re
 
 import black
 from jupyterlab_code_formatter.formatters import BaseFormatter, handle_line_ending_and_magic
@@ -27,6 +28,9 @@ class GlobalityBlackFormatter(BaseFormatter):
         logging.info(f"Options: {options}")
         logging.info(f"Line length: {self.line_length}")
         black_mode = black.Mode(line_length=self.line_length)
+
+        # Note: we cannot use \s for space here, since \s matches any whitespace character, inc. \n
+        code = re.sub(r" +\n", "\n", code)
 
         # In the future, we might be able to get black mode from options. Not possible at the moment
         # see https://github.com/ryantam626/jupyterlab_code_formatter/issues/87

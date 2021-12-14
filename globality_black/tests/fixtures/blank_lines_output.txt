@@ -118,3 +118,18 @@ def func(arg):
     arg = 5
 
     return arg
+
+
+# in this test case, we add spaces in the blank lines before the comment "spaces above"
+graph.use(
+    "logging",
+
+    "sklearn",
+
+    # spaces above
+    "sagemaker",
+
+    # This line
+    # is split in two
+    "load_dependencies",
+)

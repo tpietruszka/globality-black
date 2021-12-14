@@ -52,7 +52,7 @@ def get_new_prefix(prefix):
     """Add a token to avoid line merging"""
 
     return re.sub(
-        r"\n(\s+)",
+        r"\n( +)",
         fr"\n\1# {TUPLE_TOKEN}\n\1",
         prefix,
     )
@@ -71,7 +71,7 @@ def remove_token_from_covered_tuple(prefix):
     """Remove extra lines with TUPLE_TOKEN added in pre-processing"""
 
     return re.sub(
-        fr"\n\s+# {TUPLE_TOKEN}",
+        fr"\n +# {TUPLE_TOKEN}",
         r"",
         prefix,
     )

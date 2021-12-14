@@ -1,6 +1,7 @@
 Globality black
 ===============
 
+[Tech talk](https://docs.google.com/presentation/d/1Lp0jLSI5YJYOXEntxSvaHeOALAlndlgu/edit?usp=sharing&ouid=102083878154902570127&rtpof=true&sd=true)
 
 A wrapper for [black](https://github.com/psf/black), adding pre- and post-processing 
 to better align with Globality conventions.
@@ -31,6 +32,11 @@ read our [Black refresh](#black-refresh).
    1. [Magic comma](#magic-comma)
 1. [FAQ](#faq)
 
+
+Installation
+-----
+
+`pip install globality-black`
 
 Usage
 -----

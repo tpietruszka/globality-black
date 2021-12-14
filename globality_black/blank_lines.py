@@ -28,10 +28,11 @@ def cover_blank_lines(module, root):
 
 
 def add_token_if_line_to_keep(prefix):
-    # Add a token when two new lines
+    # Add a token when two or more new lines (optionally with spaces in them)
+    # We use " " and not "\s" since the latter denotes any whitespace character, included \r,\n, etc
     return re.sub(
-        r"\n{2,}( +)",
-        fr"\n# {BLANK_LINE_TOKEN}\n\1",
+        r"(?:\n *)+\n( +)",
+        fr"\n\1# {BLANK_LINE_TOKEN}\n\1",
         prefix,
     )
 
@@ -48,7 +49,7 @@ def remove_token_from_covered_line(prefix):
     # Note that black will add spaces before the token
 
     return re.sub(
-        fr"\n\s+# {BLANK_LINE_TOKEN}\n",
+        fr"\n +# {BLANK_LINE_TOKEN}\n",
         r"\n\n",
         prefix,
     )
