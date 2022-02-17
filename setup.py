@@ -37,6 +37,8 @@ setup(
     },
     install_requires=[
         "Click>=7.0,<8.0",
+        # TODO: remove tomli pinning when black version is changed to 22.x
+        "tomli<2.0.0",
         "parso",
         "pytest>=3",
         "black==21.7b0",
