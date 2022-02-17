@@ -17,10 +17,7 @@ def get_black_mode(src: Path) -> black.Mode:
 
     config = black.parse_pyproject_toml(value)
 
-    return black.Mode(
-        **{
-            key: value
-            for key, value in config.items()
-            if key in ["line_length", "skip_string_normalization"]
-        }
-    )
+    return black.Mode(**{
+        key: value
+        for key, value in config.items()
+    })

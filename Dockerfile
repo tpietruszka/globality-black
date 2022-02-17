@@ -84,7 +84,7 @@ RUN pip install --no-cache-dir --upgrade --extra-index-url ${EXTRA_INDEX_URL} /s
     apt-get remove --purge -y ${BUILD_PACKAGES} && \
     apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/*
-
+RUN apt-get install -y --no-install-recommends git
 
 # ----------- final -----------
 FROM base

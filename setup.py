@@ -36,7 +36,7 @@ setup(
         ],
     },
     install_requires=[
-        "Click>=7.0",
+        "Click>=7.0,<8.0",
         "parso",
         "pytest>=3",
         "black==21.7b0",

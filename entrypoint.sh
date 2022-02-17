@@ -1,5 +1,10 @@
 #!/bin/bash -e
 
+#  This file is auto generated with globality-build.
+#  You should not make any changes to this file manually
+#
+#  See: http://github.com/globality-corp/globality-build
+
 # Container entrypoint to simplify running the production and dev servers.
 
 # Entrypoint conventions are as follows:

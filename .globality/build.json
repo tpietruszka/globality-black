@@ -7,7 +7,7 @@
       ]
     },
     "flake8": {
-      "per-file-ignores": "noteboooks/*:T001"
+      "per-file-ignores": "notebooks/*:T001"
     },
     "name": "globality-black",
     "pypi": {
@@ -27,5 +27,5 @@
     "use_globality_black": true
   },
   "type": "python-library",
-  "version": "2021.21.1"
+  "version": "2022.6.0"
 }
