@@ -65,9 +65,6 @@ setup(
     },
     include_package_data=True,
     packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
-    setup_requires=[
-        "pytest-runner",
-    ],
     test_suite="tests",
     zip_safe=False,
 )

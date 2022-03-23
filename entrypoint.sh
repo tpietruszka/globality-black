@@ -25,13 +25,11 @@
 
 if [ "$1" = "test" ]; then
    # Install standard test dependencies; YMMV
-   pip --quiet install \
-       .[test] pytest pytest-cov PyHamcrest
+   pip --quiet install .[test]
    exec pytest
 elif [ "$1" = "lint" ]; then
    # Install standard linting dependencies; YMMV
-   pip --quiet install \
-       .[lint] flake8 flake8-print flake8-logging-format flake8-isort
+   pip --quiet install .[lint]
    flake8 ${NAME} && globality-black ${NAME} --check --diff
 elif [ "$1" = "typehinting" ]; then
    pip --quiet install .[typehinting]
