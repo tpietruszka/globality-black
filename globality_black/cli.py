@@ -13,7 +13,7 @@ from globality_black.constants import (
     NUM_FILES_TO_ENABLE_PARALLELIZATION,
     OH_NO_STRING,
 )
-from globality_black.diff import git_diff
+from globality_black.diff import text_diff
 from globality_black.reformat_text import BlackError, reformat_text
 
 
@@ -134,7 +134,7 @@ def process_path(
 
     if check_only_mode and is_modified:
         if diff_mode:
-            diff_output = git_diff(path, output_code)
+            diff_output = text_diff(path, output_code)
             diff_output = f"\nDiff for {path} \n" + diff_output
         initial_str = "Would reformat"
     elif not check_only_mode and is_modified:

@@ -1,11 +1,14 @@
- -1,5 +1,6 @@
+ -1,6 +1,7 @@
  import pandas as pd
- 
 +
+ 
  def foo(df: pd.DataFrame, graph):
  
      df = (
-@@ -29,24 +30,13 @@ def foo(df: pd.DataFrame, graph):
+         df
+@@ -27,27 +28,16 @@
+     )
+ 
      df = df.assign(
          predictions=df.predictions.astype(bool),
  
@@ -21,16 +24,19 @@
 -
 -
          predictions4=df.predictions.astype(bool),
+-
+-
+-
+-
+-
  
--
--
--
--
--
          # comment
          predictions5=df.predictions.astype(bool),
      )
-@@ -77,22 +67,22 @@ with pd.option_context("display.max_rows", 200):
+ 
+@@ -75,26 +65,26 @@
+     )
+ 
  
  def foo():
      return bool(
@@ -57,14 +63,18 @@
 +        # at least `z` bla bla
 +        >= z
 +    )
++
  
--class A:
- 
-+class A:
+ class A:
+-
      def foo_a():
          return bool(
              cls.get_dataframe(x, y)
-@@ -127,9 +117,6 @@ def is_valid_food(food):
+ 
+             # this is a comment in
+@@ -125,22 +115,19 @@
+ 
+ 
  def func(arg):
      arg = 5
  
@@ -74,7 +84,8 @@
      return arg
  
  
-@@ -138,7 +125,7 @@ graph.use(
+ # in this test case, we add spaces in the blank lines before the comment "spaces above"
+ graph.use(
      "logging",
  
      "sklearn",

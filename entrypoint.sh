@@ -25,17 +25,19 @@
 
 if [ "$1" = "test" ]; then
    # Install standard test dependencies; YMMV
-   pip --quiet install .[test]
-   exec pytest
+   pip --quiet install \
+       .[test] pytest pytest-cov
+   pytest
 elif [ "$1" = "lint" ]; then
    # Install standard linting dependencies; YMMV
-   pip --quiet install .[lint]
+   pip --quiet install \
+       .[lint]
    flake8 ${NAME} && globality-black ${NAME} --check --diff
 elif [ "$1" = "typehinting" ]; then
    pip --quiet install .[typehinting]
    # Install standard type-linting dependencies
    pip --quiet install mypy
-   mypy ${NAME} --ignore-missing-imports
+   exec mypy ${NAME} --ignore-missing-imports
 else
    echo "Cannot execute $@"
    exit 3

@@ -1,6 +1,8 @@
 {
   "params": {
-    "core_packages": "locales git",
+    "docker": {
+      "docker_tag": "python:3.9-slim-bullseye"
+    },
     "entrypoint": {
       "pre_typehinting_commands": [
         "pip --quiet install .[typehinting]"
@@ -27,5 +29,5 @@
     "use_globality_black": true
   },
   "type": "python-library",
-  "version": "2022.12.0"
+  "version": "2022.15.0"
 }
