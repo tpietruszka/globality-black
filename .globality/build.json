@@ -9,6 +9,7 @@
       ]
     },
     "flake8": {
+      "ignore": "G004, W503",
       "per-file-ignores": "notebooks/*:T001"
     },
     "name": "globality-black",
@@ -29,5 +30,5 @@
     "use_globality_black": true
   },
   "type": "python-library",
-  "version": "2022.15.0"
+  "version": "2022.40.1"
 }

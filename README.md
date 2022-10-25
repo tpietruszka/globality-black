@@ -84,11 +84,11 @@ To do so, install the extension, generate the config for jupyter lab and edit it
 ```shell script
 pip install jupyterlab_code_formatter
 jupyter lab --generate-config
-vim ~/.jupyter/jupyter_lab_config.py  # if you already had some config, then use jupyter_notebook_config
+vim ~/.jupyter/jupyter_lab_config.py 
 ```
 
-You might already have some config in `jupyter_notebook_config`. If so, you might want to omit
- the second command above, and edit `jupyter_notebook_config` instead.
+You might already have some config in `jupyter_lab_config`. If so, you might want to omit
+ the second command above, and edit it (vim) instead.
  
 In any case, we will add the following code:
 
@@ -124,6 +124,8 @@ Then, go to the extension preferences, and add:
 ```
 
 Notes:
+ - The last step above translates into user settings saved in 
+`~/.jupyter/lab/user-settings/@ryantam626/`.
  - The extension is applied to all cells in the notebook. It can be configured to be applied just to 
  the current cell, if interested.
  - The extension is applied to each cell in isolation. Hence, if multiple imports appear in different

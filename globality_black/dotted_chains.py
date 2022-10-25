@@ -115,7 +115,7 @@ def get_new_prefix(prefix):
 
     return re.sub(
         r"\n( +)",
-        fr"\n\1# {DOTTED_CHAIN_TOKEN}\n\1",
+        rf"\n\1# {DOTTED_CHAIN_TOKEN}\n\1",
         prefix,
     )
 
@@ -136,7 +136,7 @@ def remove_token_from_covered_dotted_chain_line(prefix):
     # Remove extra lines with DC_TOKEN" added in pre-processing
 
     return re.sub(
-        fr"\n +# {DOTTED_CHAIN_TOKEN}",
+        rf"\n +# {DOTTED_CHAIN_TOKEN}",
         r"",
         prefix,
     )
