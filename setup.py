@@ -25,7 +25,7 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],
-    description="A wrapper for black adding new features",
+    description="A wrapper for black adding new features ",
     long_description=readme + "\n\n" + history,
     long_description_content_type="text/markdown",
     url="https://github.com/globality-corp/globality-black",
