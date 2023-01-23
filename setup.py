@@ -24,6 +24,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
     ],
     description="A wrapper for black adding new features",
     long_description=readme + "\n\n" + history,
@@ -39,7 +40,7 @@ setup(
         "Click",
         "parso",
         "pytest>=3",
-        "black",
+        "black>=22.1.0",
         "pexpect",
     ],
     extras_require={
@@ -47,8 +48,8 @@ setup(
             "jupyterlab-code-formatter",
         ],
         "lint": [
-            "flake8-isort>=3.0.1",
-            "flake8-print>=3.1.0",
+            "flake8-isort>=4.1.1",
+            "flake8-print>=4.0.0",
             "flake8-logging-format",
             "globality-black",
         ],
