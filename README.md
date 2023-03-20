@@ -8,9 +8,9 @@ to better align with Globality conventions.
 
 `globality-black` performs the following steps:
 
- - pre-processing: to protect from black actions.
+ - pre-processing: to protect from black actions
  - black
- - postprocessing: to revert / correct black actions.
+ - postprocessing: to revert / correct black actions
  
 Note: if you are not familiar with black (or need a refresh), please 
 read our [Black refresh](#black-refresh).

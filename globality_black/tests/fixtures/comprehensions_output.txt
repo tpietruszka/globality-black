@@ -37,7 +37,6 @@ import pandas as pd
 
 
 def get_content_from_container(self, bar, foo):
-
     candidate = [
         i
         for i, f in enumerate(foo)

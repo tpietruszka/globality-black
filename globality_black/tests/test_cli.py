@@ -10,7 +10,7 @@ from click.testing import CliRunner
 
 from globality_black.cli import main
 from globality_black.constants import ALL_DONE_STRING, OH_NO_STRING
-from globality_black.tests import run_and_check
+from globality_black.tests import run_and_check, show_diff
 from globality_black.tests.fixtures import get_fixture_path
 
 
@@ -66,11 +66,15 @@ def test_cli_file(
 
         emoji = OH_NO_STRING if expected_exit_code == 1 else ALL_DONE_STRING
 
+        input_text = input_path.read_text()
         if has_errors or check:
-            assert input_path.read_text() == fixture_input_path.read_text()
+            expected_text = fixture_input_path.read_text()
         else:
             fixture_output_path = get_fixture_path(file_to_test_cli.replace("input", "output"))
-            assert input_path.read_text() == fixture_output_path.read_text()
+            expected_text = fixture_output_path.read_text()
+
+        _diff = show_diff(input_text, expected_text)  # noqa here to help debug
+        assert input_text == expected_text
 
         per_file_string, final_count_string = get_strings(check, file_condition)
 
@@ -78,8 +82,10 @@ def test_cli_file(
             # check the diff report is correct
             expected_diff_output_path = get_fixture_path(file_to_test_cli.replace("input", "diff"))
             diff_output = get_diff_report(result.output)
+            expected_text = expected_diff_output_path.read_text()
             # we don't check the whole thing since `temp_path` is random
-            assert expected_diff_output_path.read_text() in diff_output
+            _diff = show_diff(diff_output, expected_text)  # noqa here to help debug
+            assert expected_text in diff_output
         if verbose or needs_gb:
             pattern = f"{per_file_string} {input_path}.*{emoji}.*1 files {final_count_string}.*"
         else:
@@ -186,14 +192,16 @@ def test_cli_directory(runner: CliRunner, check: bool, error: bool, verbose: boo
             # check files were reformatted / unchanged
 
             fixture_input_path = get_fixture_path(str(filename))
-
+            input_text = filename_in_temp.read_text()
             if check or condition != FileCondition.NEEDS_GB:
                 # should be unchanged
-                assert filename_in_temp.read_text() == fixture_input_path.read_text()
+                expected_text = fixture_input_path.read_text()
             else:
                 # should be reformatted
-                expected = Path(str(fixture_input_path).replace("input", "output"))
-                assert filename_in_temp.read_text() == expected.read_text()
+                expected_text = Path(str(fixture_input_path).replace("input", "output")).read_text()
+
+            _diff = show_diff(input_text, expected_text)  # noqa here to help debug
+            assert input_text == expected_text
 
             # check per file messages
             # since the reformatting is run in parallel, we cannot guarantee the order of the

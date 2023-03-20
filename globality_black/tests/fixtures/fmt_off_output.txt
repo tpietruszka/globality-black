@@ -2,7 +2,6 @@ import pandas as pd
 
 
 def foo(df: pd.DataFrame, graph):
-
     df = (
         df
 

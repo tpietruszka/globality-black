@@ -26,7 +26,9 @@
       ],
       "repository": "pypi"
     },
+    "sonar_python_versions": "3.9,3.10",
     "test_command": "pytest",
+    "test_py37": false,
     "use_globality_black": true
   },
   "type": "python-library",

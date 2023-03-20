@@ -24,5 +24,5 @@ def test_reformat_text(feature):
     black_mode = get_black_mode(path)
     output = reformat_text(path.read_text(), black_mode)
 
-    diff = show_diff(output, expected_output)  # noqa
+    diff = show_diff(output, expected_output)  # noqa here to help debug
     assert expected_output == output

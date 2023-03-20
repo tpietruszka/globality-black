@@ -1,0 +1,169 @@
+---
+kind: pipeline
+type: kubernetes
+name: build
+
+environment:
+  NAME: globality_black
+
+trigger:
+  event:
+    - push
+
+
+
+steps:
+  - name: lint-and-type-check
+    image: python:3.9-slim
+    environment:
+      EXTRA_INDEX_URL:
+        from_secret: EXTRA_INDEX_URL
+    commands:
+      - pip install -U pip==21.3.1
+      - ./entrypoint.sh lint
+      - ./entrypoint.sh typehinting
+
+
+  - name: test-py39-latest
+    image: python:3.9-slim
+    environment:
+      EXTRA_INDEX_URL:
+        from_secret: EXTRA_INDEX_URL
+    commands:
+      - pip install -U pip==21.3.1
+      - ./entrypoint.sh test
+
+  - name: sonar-scanner
+    image: sonarsource/sonar-scanner-cli:latest
+    environment:
+      SONARQUBE_TOKEN:
+        from_secret: SONARQUBE_TOKEN
+    commands:
+      - >-
+        sonar-scanner
+        -Dsonar.login=$SONARQUBE_TOKEN
+        -Dsonar.projectBaseDir=/drone/src
+        -Dsonar.host.url=https://sonarqube.globality.cloud
+        -Dsonar.branch.name=${DRONE_BRANCH}
+    depends_on:
+      - lint-and-type-check
+      - test-py39-latest
+
+  - name: set-version-number
+    image: python:3.9-slim
+    depends_on:
+      - sonar-scanner
+    commands:
+      - if ! grep -iq 'version = "0.1.0"' setup.py; then exit 1; fi
+      - 'VERSION_PART=$(( ${DRONE_BUILD_NUMBER} + 50000 ))'
+      - '[ ${DRONE_BRANCH} = master ] || PY_DEV_VERSION=".dev$VERSION_PART"'
+      - PYTHON_PACKAGE_VERSION="0.$VERSION_PART$PY_DEV_VERSION"
+      - echo "Building Python package version $PYTHON_PACKAGE_VERSION"
+      - sed -i -e 's#version = "0.1.0"#version = "'$PYTHON_PACKAGE_VERSION'"#' setup.py
+
+  - name: release-python-library
+    image: python:3.9-slim
+    environment:
+      ARTIFACTORY_USERNAME:
+        from_secret: ARTIFACTORY_USERNAME
+      ARTIFACTORY_PASSWORD:
+        from_secret: ARTIFACTORY_PASSWORD
+    depends_on:
+      - set-version-number
+    commands:
+      - pip install pip==21.3.1
+      - pip install twine==3.8.0
+      - pip install packaging==21.3
+      - python setup.py sdist bdist_wheel
+      - >-
+        twine upload --non-interactive
+        --repository-url https://globality.jfrog.io/globality/api/pypi/pypi
+        --username $ARTIFACTORY_USERNAME
+        --password $ARTIFACTORY_PASSWORD
+        dist/*
+
+  - name: dependency-validation
+    pull: always
+    failure: ignore
+    image: 308798440167.dkr.ecr.us-east-1.amazonaws.com/globality-whitelist:latest
+    commands:
+      - globality-whitelist validate-local --tier backend --path .
+
+  - name: report-status
+    image: 308798440167.dkr.ecr.us-east-1.amazonaws.com/globality-build:master
+    pull: always
+    environment:
+      DRONE_API_TOKEN:
+        from_secret: DRONE_API_TOKEN
+      GITHUB_PRIVATE_KEY:
+        from_secret: GITHUB_PRIVATE_KEY
+      DRONE_STEP_NAMES: "dependency-validation"
+    commands:
+      - globality-build drone-to-github-status
+    depends_on:
+      - dependency-validation
+
+---
+kind: pipeline
+type: kubernetes
+name: pr
+
+trigger:
+  event:
+    - pull_request
+
+
+steps:
+  # only try to create pull requests for dependency validation once a pull request has been
+  # created for the branch
+  - name: dependency-validation
+    pull: always
+    image: 308798440167.dkr.ecr.us-east-1.amazonaws.com/globality-whitelist:latest
+    environment:
+      GITHUB_PRIVATE_KEY:
+        from_secret: GITHUB_PRIVATE_KEY
+    commands:
+      - globality-whitelist validate-local --tier backend --path . --create-pr
+
+
+---
+kind: secret
+name: SONARQUBE_TOKEN
+get:
+  path: secrets/dev/drone
+  name: DRONE_SONARQUBE_TOKEN
+
+---
+kind: secret
+name: EXTRA_INDEX_URL
+get:
+  path: secrets/dev/drone
+  name: DRONE_EXTRA_INDEX_URL
+
+---
+kind: secret
+name: ARTIFACTORY_USERNAME
+get:
+  path: secrets/dev/drone
+  name: DRONE_ARTIFACTORY_USERNAME
+
+---
+kind: secret
+name: ARTIFACTORY_PASSWORD
+get:
+  path: secrets/dev/drone
+  name: DRONE_ARTIFACTORY_PASSWORD
+
+---
+kind: secret
+name: GITHUB_PRIVATE_KEY
+get:
+  path: secrets/dev/drone
+  name: DRONE_GITHUB_PRIVATE_KEY
+
+---
+kind: secret
+name: DRONE_API_TOKEN
+get:
+  path: secrets/dev/drone
+  name: DRONE_API_TOKEN
