@@ -3,7 +3,7 @@ import multiprocessing as mp
 import sys
 from functools import partial
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Union
 
 import click
 
@@ -18,13 +18,14 @@ from globality_black.reformat_text import BlackError, reformat_text
 
 
 @click.command()
-@click.argument("path", type=click.Path(readable=True, writable=True, exists=True))
+@click.argument("src", type=str)
 @click.option("--check/--no-check", type=bool, default=False)
 @click.option("--verbose/--no-verbose", type=bool, default=False)
+@click.option("-c", "--code", type=str, help="Format the code passed in as a string.")
 @click.option("--diff/--no-diff", type=bool, default=False)
 # characters \b needed to avoid click reformatting
 # see https://click.palletsprojects.com/en/7.x/documentation/#preventing-rewrapping
-def main(path, check, diff, verbose):
+def main(src, check, diff, code, verbose):
     """
     Run globality-black for a given path
 
@@ -57,7 +58,14 @@ def main(path, check, diff, verbose):
 
     """
 
-    path = Path(path)
+    if code:
+        output_code, output_msg = process_src(src)
+        print(output_msg)
+        return output_code
+
+    path = Path(src)
+    assert path.exists(), f"Path {path} does not exist"
+
     exit_code = 0
     if diff:
         check = True
@@ -67,7 +75,7 @@ def main(path, check, diff, verbose):
         paths = [path]
 
     reformatted_count, failed_count = 0, 0
-    process_path_with_check = partial(process_path, check_only_mode=check, diff_mode=diff)
+    process_path_with_check = partial(process_src, check_only_mode=check, diff_mode=diff)
 
     parallelize = len(paths) > NUM_FILES_TO_ENABLE_PARALLELIZATION
     if parallelize:
@@ -111,8 +119,8 @@ def main(path, check, diff, verbose):
     sys.exit(exit_code)
 
 
-def process_path(
-    path: Path,
+def process_src(
+    src: Union[Path, str],
     check_only_mode: bool = False,
     diff_mode: bool = False,
 ) -> Tuple[bool, bool, str]:
@@ -121,35 +129,50 @@ def process_path(
     """
 
     is_modified = False
-    input_code = path.read_text()
-    black_mode = get_black_mode(path)
+    file_mode = isinstance(src, Path)
+    if file_mode:
+        input_code = src.read_text()
+        black_mode = get_black_mode(src)
+        path = src
+    else:
+        input_code = src
+        black_mode = get_black_mode(".")
+
+    path_str = f" {path}" if file_mode else ""
     diff_output = ""
     try:
         output_code = reformat_text(input_code, black_mode)
     except BlackError as e:
-        return False, True, f"Failed to reformat {path}. {e}"
+        return False, True, f"Failed to reformat{path_str}. {e}"
 
     if input_code != output_code:
         is_modified = True
 
     if check_only_mode and is_modified:
         if diff_mode:
-            diff_output = text_diff(path, output_code)
-            diff_output = f"\nDiff for {path} \n" + diff_output
+            diff_output = text_diff(src, output_code, path)
+            diff_path_str = f" for {path}" if file_mode else ""
+            diff_output = f"\nDiff{diff_path_str} \n" + diff_output
         initial_str = "Would reformat"
     elif not check_only_mode and is_modified:
         initial_str = "Reformatted"
     else:
         initial_str = "Nothing to do for"
 
-    if not check_only_mode:
+    if not check_only_mode and file_mode:
         path.write_text(output_code)
+
+    path_str = f" {path}" if file_mode else ""
     if diff_mode:
         # if diff we add the diff report to the reformat message
-        output = diff_output + "\n" + f"{initial_str} {path}"
+
+        output_msg = diff_output + "\n" + f"{initial_str}{path_str}"
     else:
-        output = f"{initial_str} {path}"
-    return is_modified, False, output
+        output_msg = f"{initial_str}{path_str}"
+
+    if file_mode:
+        return is_modified, False, output_msg
+    return output_code, output_msg
 
 
 if __name__ == "__main__":

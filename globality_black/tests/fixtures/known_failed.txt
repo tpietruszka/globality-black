@@ -20,3 +20,12 @@ def read_df(path: Path):
          if path.name.endswith("xlsx")
          else pd.read_csv(path)
     ).assign(correction_source=path.name)
+
+
+# 3. For single element subscripts, we don't explode even if there is a magic comma. Example:
+
+my_df = my_df[
+    ["col1", "col2", *my_df.columns[2:]],
+]
+
+Gets compressed to a single line

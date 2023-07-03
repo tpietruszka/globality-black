@@ -320,8 +320,9 @@ Pending / Future work
 
 - Explode ternary operators under some criteria
 - Nested comprehensions
+- Magic comma for single element subscripts, due to [this](https://github.com/psf/black/pull/2942/files#diff-31972cba2ef33b6d8853302bec17d8c60e796566d67ce57e5d233f17a0c6f5a4R17-R18)
 
-Please give us feedback if you find any issues
+Please give us feedback if you find any issues, and check `known_failed`
 
 
 Black refresh
