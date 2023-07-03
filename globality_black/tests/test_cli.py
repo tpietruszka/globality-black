@@ -54,13 +54,15 @@ def test_cli_file(
     fixture_input_path = get_fixture_path(file_to_test_cli)
 
     with tempfile.TemporaryDirectory() as temp_path:
-
         # copy file fixtures/*.txt -> temp_dir/*.py
         # we don't really need to change suffix to .py, but to make the test more realistic
         input_path = (Path(temp_path) / file_to_test_cli).with_suffix(".py")
         shutil.copy(str(fixture_input_path), str(input_path))
-
-        result = run_globality_black(runner, input_path, check, verbose, diff)
+        result = run_globality_black(
+            runner,
+            input_path,
+            dict(check=check, verbose=verbose, diff=diff),
+        )
         expected_exit_code = 1 if has_errors or check and needs_gb else 0
         assert result.exit_code == expected_exit_code
 
@@ -93,16 +95,12 @@ def test_cli_file(
         assert re.search(pattern, result.output, flags=re.DOTALL)
 
 
-def run_globality_black(runner: CliRunner, path: Path, check: bool, verbose: bool, diff: bool):
+def run_globality_black(runner: CliRunner, path: str, kwargs: dict[str, bool] = dict):
     args = [str(path)]
-    if check:
-        args.append("--check")
 
-    if verbose:
-        args.append("--verbose")
-
-    if diff:
-        args.append("--diff")
+    for arg in ("check", "verbose", "diff", "code"):
+        if kwargs.get(arg, False):
+            args.append(f"--{arg}")
 
     result = run_and_check(
         runner=runner,
@@ -114,7 +112,6 @@ def run_globality_black(runner: CliRunner, path: Path, check: bool, verbose: boo
 
 
 def get_strings(check: bool, condition: FileCondition) -> Tuple[str, str]:
-
     if condition == FileCondition.HAS_ERRORS:
         per_file_string = "Failed to reformat"
         final_count_string = r"failed to parse \(black error\)"
@@ -168,7 +165,6 @@ def test_cli_directory(runner: CliRunner, check: bool, error: bool, verbose: boo
         file_conditions.append(FileCondition.HAS_ERRORS)
 
     with tempfile.TemporaryDirectory() as temp_path_str:
-
         # create subdir
         temp_path = Path(temp_path_str)
         (temp_path / "subdir").mkdir()
@@ -181,14 +177,13 @@ def test_cli_directory(runner: CliRunner, check: bool, error: bool, verbose: boo
             shutil.copy(str(fixture_input_path), str(filename_in_temp))
             filenames_in_temp.append(filename_in_temp)
 
-        result = run_globality_black(runner, temp_path, check, verbose, diff=False)
+        result = run_globality_black(runner, temp_path, dict(check=check, verbose=verbose))
         expected_exit_code = 1 if check or error else 0
         assert result.exit_code == expected_exit_code
 
         for filename_in_temp, filename, to_subdir, condition in zip(
             filenames_in_temp, filenames, files_to_move_to_subdir, file_conditions
         ):
-
             # check files were reformatted / unchanged
 
             fixture_input_path = get_fixture_path(str(filename))

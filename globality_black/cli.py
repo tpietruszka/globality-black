@@ -21,11 +21,11 @@ from globality_black.reformat_text import BlackError, reformat_text
 @click.argument("src", type=str)
 @click.option("--check/--no-check", type=bool, default=False)
 @click.option("--verbose/--no-verbose", type=bool, default=False)
-@click.option("-c", "--code", type=str, help="Format the code passed in as a string.")
+@click.option("-c", "--code", type=bool, help="Format the code passed in as a string.")
 @click.option("--diff/--no-diff", type=bool, default=False)
 # characters \b needed to avoid click reformatting
 # see https://click.palletsprojects.com/en/7.x/documentation/#preventing-rewrapping
-def main(src, check, diff, code, verbose):
+def main(src: str, check: bool, diff: bool, code: bool, verbose: bool):
     """
     Run globality-black for a given path
 
@@ -140,6 +140,7 @@ def process_src(
 
     path_str = f" {path}" if file_mode else ""
     diff_output = ""
+
     try:
         output_code = reformat_text(input_code, black_mode)
     except BlackError as e:
@@ -150,7 +151,7 @@ def process_src(
 
     if check_only_mode and is_modified:
         if diff_mode:
-            diff_output = text_diff(src, output_code, path)
+            diff_output = text_diff(input_code, output_code, path)
             diff_path_str = f" for {path}" if file_mode else ""
             diff_output = f"\nDiff{diff_path_str} \n" + diff_output
         initial_str = "Would reformat"
