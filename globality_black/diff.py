@@ -1,11 +1,14 @@
 from pathlib import Path
 from typing import Union
 
-
 from black import color_diff, diff
 
 
-def text_diff(input_code: str, output_code: str, input_path: Union[Path, str] = "") -> str:
+def text_diff(
+    input_code: str,
+    output_code: str,
+    input_path: Union[Path, str] = "",
+) -> str:
     """
     Report the differences that globality black will make to input_path file
     in a git-like format leveraging code already in black.

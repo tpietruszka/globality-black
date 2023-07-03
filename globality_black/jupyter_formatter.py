@@ -10,7 +10,6 @@ from globality_black.reformat_text import reformat_text
 
 
 class GlobalityBlackFormatter(BaseFormatter):
-
     label = "Apply Globality Black Formatter"
 
     def __init__(self, line_length=100):

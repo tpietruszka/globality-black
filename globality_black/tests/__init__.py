@@ -37,7 +37,6 @@ def run_and_check(
     command: click.Command,
     args: Sequence[str],
 ) -> Result:
-
     logging.info(f"Running command: {command_name} {' '.join(args)}")
     result = runner.invoke(command, args)
     return result

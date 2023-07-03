@@ -18,13 +18,23 @@ from globality_black.reformat_text import BlackError, reformat_text
 
 
 @click.command()
-@click.argument("src", type=click.File("rt"), default=sys.stdin)
-@click.option("--check/--no-check", type=bool, default=False)
-@click.option("--verbose/--no-verbose", type=bool, default=False)
-@click.option("--code/--no-code", type=bool, help="Format the code passed in as a string.", default=False)
-@click.option("--diff/--no-diff", type=bool, default=False)
+@click.option("--check/--no-check", is_flag=True)
+@click.option("--verbose/--no-verbose", is_flag=True)
+@click.option(
+    "--code/--no-code",
+    type=bool,
+    help="Format the code passed in as a string.",
+    default=False,
+)
+@click.option("--diff/--no-diff", is_flag=True)
 # characters \b needed to avoid click reformatting
 # see https://click.palletsprojects.com/en/7.x/documentation/#preventing-rewrapping
+@click.argument(
+    "src",
+    type=click.Path(exists=True, file_okay=True, dir_okay=True, readable=True, allow_dash=True),
+    required=False,
+    is_eager=True,
+)
 def main(src, check: bool, diff: bool, code: bool, verbose: bool):
     """
     Run globality-black for a given path
@@ -58,11 +68,17 @@ def main(src, check: bool, diff: bool, code: bool, verbose: bool):
 
     """
     if code:
-        input_code = src.read()
+        # this bit is used by the `External formatters` VScode extension
+        input_code = sys.stdin.read()
         output_code, output_msg = process_src(input_code)
+        # not sure why but VScode adds a newline at the end of the output
+        output_code = output_code[:-1]
+        # use stderr for the output msg, to avoid writing into the file
         click.echo(output_msg, file=sys.stderr)
         click.echo(output_code, file=sys.stdout)
         return
+    if src is None:
+        raise ValueError("src should be passed if not using --code")
 
     path = Path(src)
     assert path.exists(), f"Path {path} does not exist"

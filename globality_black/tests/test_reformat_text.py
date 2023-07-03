@@ -17,7 +17,6 @@ from globality_black.tests.fixtures import get_fixture_path
     ],
 )
 def test_reformat_text(feature):
-
     path = get_fixture_path(f"{feature}_input.txt")
     expected_output = get_fixture_path(f"{feature}_output.txt").read_text()
 

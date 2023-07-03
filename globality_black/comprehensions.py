@@ -96,7 +96,6 @@ def _reformat_comprehension(comp_for: PythonNode):
 
 
 def set_prefix(element: PythonNode, prefix: str):
-
     leaf = element.get_first_leaf()
 
     # if there's only space, replace

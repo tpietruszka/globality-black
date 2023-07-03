@@ -19,7 +19,6 @@ class BlackError(Exception):
 
 
 def reformat_text(file_contents, black_mode):
-
     module = parso.parse(file_contents)
 
     # PRE-PROCESSING

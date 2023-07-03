@@ -3,7 +3,7 @@ Globality black
 
 [Tech talk](https://docs.google.com/presentation/d/1Lp0jLSI5YJYOXEntxSvaHeOALAlndlgu/edit?usp=sharing&ouid=102083878154902570127&rtpof=true&sd=true)
 
-A wrapper for [black](https://github.com/psf/black), adding pre- and post-processing 
+A wrapper for [black](https://github.com/psf/black), adding pre- and post-processing
 to better align with Globality conventions.
 
 `globality-black` performs the following steps:
@@ -11,26 +11,32 @@ to better align with Globality conventions.
  - pre-processing: to protect from black actions
  - black
  - postprocessing: to revert / correct black actions
- 
-Note: if you are not familiar with black (or need a refresh), please 
+
+Note: if you are not familiar with black (or need a refresh), please
 read our [Black refresh](#black-refresh).
 
 
 ## Table of contents
-1. [Usage](#usage)
-   1. [CLI](#cli)
-   1. [Pycharm](#pycharm)
-   1. [JupyterLab](#jupyterlab)
-   1. [VSCode](#vscode)
-1. [Features](#features)
-   1. [Blank lines](#blank-lines) 
-   1. [Dotted chains](#dotted-chains) 
-   1. [Comprehensions](#comprehensions) 
-   1. [Partially disable Globality Black](#partially-disable-globality-black) 
-1. [Pending / Future work](#pending--future-work)
-1. [Black refresh](#black-refresh)
-   1. [Magic comma](#magic-comma)
-1. [FAQ](#faq)
+- [Globality black](#globality-black)
+  - [Table of contents](#table-of-contents)
+  - [Installation](#installation)
+  - [Usage](#usage)
+    - [CLI](#cli)
+    - [Pycharm](#pycharm)
+    - [JupyterLab](#jupyterlab)
+    - [VScode](#vscode)
+  - [Features](#features)
+    - [Blank lines](#blank-lines)
+    - [Dotted chains](#dotted-chains)
+    - [Length one tuples](#length-one-tuples)
+    - [Comprehensions](#comprehensions)
+      - [Before globality-black](#before-globality-black)
+      - [After globality-black](#after-globality-black)
+    - [Partially disable globality-black](#partially-disable-globality-black)
+  - [Pending / Future work](#pending--future-work)
+  - [Black refresh](#black-refresh)
+    - [Magic comma](#magic-comma)
+  - [FAQ](#faq)
 
 
 Installation
@@ -41,16 +47,16 @@ Installation
 Usage
 -----
 
-There are two ways to use `globality-black`, via CLI, or importing the helpers in the library. 
+There are two ways to use `globality-black`, via CLI, or importing the helpers in the library.
 Next, we show some typical use cases:
 
 ### CLI
 
-Please see command line arguments running `globality-black --help`. 
+Please see command line arguments running `globality-black --help`.
 
 ### Pycharm
 
-To use `globality-black` in PyCharm, go to PyCharm -> Preferences... -> Tools -> External Tools -> Click + symbol 
+To use `globality-black` in PyCharm, go to PyCharm -> Preferences... -> Tools -> External Tools -> Click + symbol
 to add new external tool.
 
 ![img](docs/pycharm-external-tools.png)
@@ -84,12 +90,12 @@ To do so, install the extension, generate the config for jupyter lab and edit it
 ```shell script
 pip install jupyterlab_code_formatter
 jupyter lab --generate-config
-vim ~/.jupyter/jupyter_lab_config.py 
+vim ~/.jupyter/jupyter_lab_config.py
 ```
 
 You might already have some config in `jupyter_lab_config`. If so, you might want to omit
  the second command above, and edit it (vim) instead.
- 
+
 In any case, we will add the following code:
 
 ```python
@@ -110,7 +116,7 @@ Then, go to the extension preferences, and add:
             ],
         }
     },
-    "isort": {            
+    "isort": {
            "combine_as_imports": true,
            "force_grid_wrap": 4,
            "force_to_top": "true",
@@ -124,40 +130,67 @@ Then, go to the extension preferences, and add:
 ```
 
 Notes:
- - The last step above translates into user settings saved in 
+ - The last step above translates into user settings saved in
 `~/.jupyter/lab/user-settings/@ryantam626/`.
- - The extension is applied to all cells in the notebook. It can be configured to be applied just to 
+ - The extension is applied to all cells in the notebook. It can be configured to be applied just to
  the current cell, if interested.
  - The extension is applied to each cell in isolation. Hence, if multiple imports appear in different
- cells, they won't be merged together on top of the notebook. 
+ cells, they won't be merged together on top of the notebook.
 
 
 ### VScode
 
-To use `globality-black` in VScode go to Preferences: Keyboard Shortcuts (JSON) from the Palette (command+shift+p)   
-It will open a file named `keybindings.json`, then add to this file :
+To use `globality-black` in VScode, install the extension
+[External formatters](https://marketplace.visualstudio.com/items?itemName=SteefH.external-formatters).
+
+Then, go to Preferences: Settings (JSON). A file `settings.json` will open.
+Add this to the file:
+```json
+"[python]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        },
+        "editor.defaultFormatter": "SteefH.external-formatters",
+    },
+    "isort.args":["--profile", "black"],
+```
+This will configure isort to run when saving, and glo-black as the default
+formatter. Add also this
 ```json
 [
-    {
-        "key": "the shortcut you want (ctrl+b for example)",
-        "command": "workbench.action.terminal.sendSequence",
-        "args": {
-          "text": "globality-black ${file}"
+    "externalFormatters.languages": {
+        "python": {
+            "command": "..../envs/gblack/bin/globality-black",
+            "arguments": [
+                "--code",
+            ]
         }
     }
 ]
 ```
-This will allow you to run `globality-black` per file.
-To run `globality-black` to the folder opened in VSCode just replace **file** by **workspaceFolder**.  
-You can also add any arguments supported by the CLI (`--check` or `--diff` are recommended to avoid 
-formatting the whole repo)
+completing the `....` with whatever you need to get to the glo-black Python env.
+
+ Then, go to `Preferences: Keyboard Shortcuts (JSON)` from the Palette
+ (command+shift+p). The file `keybindings.json` will open.
+ Add to this file:
+```json
+[
+    {
+        "key": "cmd+shift+j",
+        "command": "editor.action.formatDocument",
+        "when": "editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && !inCompositeEditor"
+    }
+]
+```
+This will allow you to run `globality-black` on the currently open file,
+passing the content of the file via stdin.
 
 
 Features
 --------
 
 ### Blank lines
- 
+
 Black would remove those blank lines after `wandb` and `scikit-learn` below:
 
 ```
@@ -171,7 +204,7 @@ graph.use(
 )
 ```
 
-`globality-black` protects those assuming the developer added them for readability. 
+`globality-black` protects those assuming the developer added them for readability.
 
 
 ### Dotted chains
@@ -194,12 +227,12 @@ LABELS = set(
 )
 ```
 
-the same. In this feature, **we don't explode anything** but rather protect code assuming it was 
-written by this in purpose for readability. 
+the same. In this feature, **we don't explode anything** but rather protect code assuming it was
+written by this in purpose for readability.
 
 ### Length one tuples
 
-This is a very simple and specific feature. Black (at least up to 21.9b0) has a bug so that tuples 
+This is a very simple and specific feature. Black (at least up to 21.9b0) has a bug so that tuples
 with one element are compressed as in
 
 ```python
@@ -211,11 +244,11 @@ becomes
 ```python
 x = (3,)
 ```
-See https://github.com/psf/black/issues/1139#issuecomment-951014094. With globality-black, 
+See https://github.com/psf/black/issues/1139#issuecomment-951014094. With globality-black,
 will protect these.
 
 
-### Comprehensions 
+### Comprehensions
 
 Explode comprehensions
 * all dict comprehensions
@@ -247,7 +280,7 @@ double_comp2 = [[i for i in range(7) if i < 5] for j in range(10)]
 double_comp3 = {i: [i for i in range(7) if i < 5] for j in range(10) if i < 2}
 ```
 
-#### After globality-black 
+#### After globality-black
 
 ```
 [3 for _ in range(10)]
@@ -270,31 +303,31 @@ double_comp3 = {i: [i for i in range(7) if i < 5] for j in range(10) if i < 2}
 }
 
 [
-    "odd" if i %% 2 == 0 else "even" 
+    "odd" if i %% 2 == 0 else "even"
     for _ in range(10)
 ]
 
 double_comp1 = [
-    3 * i * j 
-    for i in range(10) 
+    3 * i * j
+    for i in range(10)
     for j in range(4)
 ]
 
 double_comp2 = [
-    [i for i in range(7) if i < 5] 
+    [i for i in range(7) if i < 5]
     for j in range(10)
 ]
 
 double_comp3 = {
-    i: [i for i in range(7) if i < 5] 
-    for j in range(10) 
+    i: [i for i in range(7) if i < 5]
+    for j in range(10)
     if i < 2
 }
 ```
 
 Note that in the last two comprehensions, the nested comprehensions are not exploded even though
 having an if. This is a limitation of `globality-black`, but we believe not very frequent
-in everyday cases. If you really want to explode those and make `globality-black` respect it, 
+in everyday cases. If you really want to explode those and make `globality-black` respect it,
 please use the feature explained next.
 
 ### Partially disable globality-black
@@ -330,20 +363,20 @@ Black refresh
 
 `black` is an opinionated Python formatter that tries to save as much vertical space as possible. In
 this regard, it compresses lines to the maximum character length that has been configured. `black`'s
-default is 88, whereas in `globality-black` we use a default of 100 characters, as agreed for 
+default is 88, whereas in `globality-black` we use a default of 100 characters, as agreed for
 Globality repos globally. If you want to have a custom max character length, add a `pyproject.toml`
-file to the root of your repo. This works the same way as in `black`, and `globality-black` will 
+file to the root of your repo. This works the same way as in `black`, and `globality-black` will
 take your config from there.
 
-See how `black` works in their [README](https://github.com/psf/black). It is especially useful to 
-review [this section](https://github.com/psf/black/blob/master/docs/the_black_code_style.md), where 
+See how `black` works in their [README](https://github.com/psf/black). It is especially useful to
+review [this section](https://github.com/psf/black/blob/master/docs/the_black_code_style.md), where
 important recent features are explained.
 
 ### Magic comma
- 
-`black` added a feature at the end of 2020 that we used to call the "magic comma". It's one of the 
-first examples where `black` is giving a bit of freedom to the developer on how the final code will 
-look like (apart from `fmt:off` and `fmt:on` to ignore `black` entirely). Read more about it 
+
+`black` added a feature at the end of 2020 that we used to call the "magic comma". It's one of the
+first examples where `black` is giving a bit of freedom to the developer on how the final code will
+look like (apart from `fmt:off` and `fmt:on` to ignore `black` entirely). Read more about it
 [here](https://github.com/psf/black/blob/main/docs/the_black_code_style/current_style.md#the-magic-trailing-comma).
 
 FAQ
@@ -355,20 +388,20 @@ Here we list a number of questions and solutions raised when presenting this pro
 
 Our recommendation is:
  1. Create a big PR for all your repo, and do the effort of reviewing the changes just once.
- 1. Add a `.git-blame-ignore-revs` file to your repo, ignoring the bulk commit where 
- `globality-black` is applied. See 
- [here](https://www.moxio.com/blog/43/ignoring-bulk-change-commits-with-git-blame) 
+ 1. Add a `.git-blame-ignore-revs` file to your repo, ignoring the bulk commit where
+ `globality-black` is applied. See
+ [here](https://www.moxio.com/blog/43/ignoring-bulk-change-commits-with-git-blame)
  for more details.
 
 **I like most of the changes, but in some places I really prefer the way I write the code**
 
-No problem, for those specific cases where you like more your style, just wrap the block with 
+No problem, for those specific cases where you like more your style, just wrap the block with
 `fmt:off` and `fmt:on`, see the
 [Partially disable Globality Black](#partially-disable-globality-black) section.
 
 **100 characters per line is too short / too long for me**
 
-Just add a `pyproject.toml` to the root of your repo (as the one in this very own 
+Just add a `pyproject.toml` to the root of your repo (as the one in this very own
 project) and specify your preferred length, see the [Black refresh](#black-refresh) section.
 
 **I want to know what will be changed before applying the changes**

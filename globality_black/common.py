@@ -20,7 +20,6 @@ class SyntaxTreeVisitor:
         self.fmt_off = False
 
     def __call__(self, node):
-
         self.set_fmt_on_off_according_to_prefix(node)
         if self.types_to_find is None or node.type in self.types_to_find and not self.fmt_off:
             yield node
