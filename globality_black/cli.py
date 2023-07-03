@@ -18,14 +18,14 @@ from globality_black.reformat_text import BlackError, reformat_text
 
 
 @click.command()
-@click.argument("src", type=str)
+@click.argument("src", type=click.File("rt"), default=sys.stdin)
 @click.option("--check/--no-check", type=bool, default=False)
 @click.option("--verbose/--no-verbose", type=bool, default=False)
-@click.option("-c", "--code", type=bool, help="Format the code passed in as a string.")
+@click.option("--code/--no-code", type=bool, help="Format the code passed in as a string.", default=False)
 @click.option("--diff/--no-diff", type=bool, default=False)
 # characters \b needed to avoid click reformatting
 # see https://click.palletsprojects.com/en/7.x/documentation/#preventing-rewrapping
-def main(src: str, check: bool, diff: bool, code: bool, verbose: bool):
+def main(src, check: bool, diff: bool, code: bool, verbose: bool):
     """
     Run globality-black for a given path
 
@@ -57,11 +57,12 @@ def main(src: str, check: bool, diff: bool, code: bool, verbose: bool):
         If --diff, do not modify the files and display the changes induced by reformatting
 
     """
-
     if code:
-        output_code, output_msg = process_src(src)
-        print(output_msg)
-        return output_code
+        input_code = src.read()
+        output_code, output_msg = process_src(input_code)
+        click.echo(output_msg, file=sys.stderr)
+        click.echo(output_code, file=sys.stdout)
+        return
 
     path = Path(src)
     assert path.exists(), f"Path {path} does not exist"
