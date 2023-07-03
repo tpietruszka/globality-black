@@ -95,7 +95,7 @@ def test_cli_file(
         assert re.search(pattern, result.output, flags=re.DOTALL)
 
 
-def run_globality_black(runner: CliRunner, path: str, kwargs: dict[str, bool] = dict):
+def run_globality_black(runner: CliRunner, path: Path, kwargs: dict[str, bool]):
     args = [str(path)]
 
     for arg in ("check", "verbose", "diff", "code"):

@@ -70,10 +70,12 @@ def main(src, check: bool, diff: bool, code: bool, verbose: bool):
     if code:
         # this bit is used by the `External formatters` VScode extension
         input_code = sys.stdin.read()
-        output_code, output_msg = process_src(input_code)
+        output_code, output_msg, *_ = process_src(input_code)
         # not sure why but VScode adds a newline at the end of the output
+        assert isinstance(output_code, str)
         output_code = output_code[:-1]
         # use stderr for the output msg, to avoid writing into the file
+        assert isinstance(output_msg, str)
         click.echo(output_msg, file=sys.stderr)
         click.echo(output_code, file=sys.stdout)
         return
@@ -100,9 +102,9 @@ def main(src, check: bool, diff: bool, code: bool, verbose: bool):
             map_result = pool.map(process_path_with_check, paths)
     else:
         # Do not parallelize if just a few files
-        map_result = map(process_path_with_check, paths)
+        map_result = list(map(process_path_with_check, paths))
 
-    for is_modified, is_failed, message in map_result:
+    for is_modified, is_failed, message in map_result:  # type: ignore
         if verbose or is_modified or is_failed:
             click.echo(message)
         reformatted_count += is_modified
@@ -140,7 +142,7 @@ def process_src(
     src: Union[Path, str],
     check_only_mode: bool = False,
     diff_mode: bool = False,
-) -> Tuple[bool, bool, str]:
+) -> Union[tuple[str, str], tuple[bool, bool, str]]:
     """
     For each path compute `is_modified`, `is_failed`, and `message` to be used in main
     """
@@ -148,7 +150,7 @@ def process_src(
     is_modified = False
     file_mode = isinstance(src, Path)
     if file_mode:
-        input_code = src.read_text()
+        input_code = src.read_text()  # type: ignore
         black_mode = get_black_mode(src)
         path = src
     else:
@@ -178,7 +180,7 @@ def process_src(
         initial_str = "Nothing to do for"
 
     if not check_only_mode and file_mode:
-        path.write_text(output_code)
+        path.write_text(output_code)  # type: ignore
 
     path_str = f" {path}" if file_mode else ""
     if diff_mode:
