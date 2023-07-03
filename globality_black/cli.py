@@ -3,7 +3,7 @@ import multiprocessing as mp
 import sys
 from functools import partial
 from pathlib import Path
-from typing import Tuple, Union
+from typing import Union
 
 import click
 
