@@ -25,6 +25,9 @@ read our [Black refresh](#black-refresh).
     - [Pycharm](#pycharm)
     - [JupyterLab](#jupyterlab)
     - [VScode](#vscode)
+      - [Working with remotes](#working-with-remotes)
+      - [Shortcuts](#shortcuts)
+      - [Working with notebooks](#working-with-notebooks)
   - [Features](#features)
     - [Blank lines](#blank-lines)
     - [Dotted chains](#dotted-chains)
@@ -143,8 +146,7 @@ Notes:
 To use `globality-black` in VScode, install the extension
 [External formatters](https://marketplace.visualstudio.com/items?itemName=SteefH.external-formatters).
 
-Then, go to Preferences: Settings (JSON). A file `settings.json` will open.
-Add this to the file:
+Then, go to Preferences: Settings (JSON). A file `settings.json` will open. Add this to the file:
 ```json
 "[python]": {
         "editor.codeActionsOnSave": {
@@ -165,13 +167,26 @@ formatter. Add also this
                 "--code",
             ]
         }
-    }
+    },
+    "isort.interpreter": [
+        ".../envs/gblack/bin/python"
+    ],
 ]
 ```
 completing the `....` with whatever you need to get to the glo-black Python env.
 
- Then, go to `Preferences: Keyboard Shortcuts (JSON)` from the Palette
- (command+shift+p). The file `keybindings.json` will open.
+#### Working with remotes
+Important: these two paths have to be absolute paths, and need to be the
+same everywhere you use VScode. This means that if you use VScode on remotes,
+the same paths needs to exist. Obviosuly, that's not possible, since e.g.
+in EC2 you'll have `/home/ubuntu/...` and in your machine `/Users/john/...`. A workaround for this is to create a symbolic link in your instance, e.g:
+```bash
+sudo ln -s /home/ubuntu /Users/john
+```
+
+#### Shortcuts
+
+ To configure shortcuts, go to `Preferences: Keyboard Shortcuts (JSON)` from the Palette (command+shift+p). The file `keybindings.json` will open.
  Add to this file:
 ```json
 [
@@ -184,6 +199,8 @@ completing the `....` with whatever you need to get to the glo-black Python env.
 ```
 This will allow you to run `globality-black` on the currently open file,
 passing the content of the file via stdin.
+
+#### Working with notebooks
 
 To format notebooks, there is a shortcut
 ```json
