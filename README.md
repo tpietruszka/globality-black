@@ -185,6 +185,19 @@ completing the `....` with whatever you need to get to the glo-black Python env.
 This will allow you to run `globality-black` on the currently open file,
 passing the content of the file via stdin.
 
+To format notebooks, there is a shortcut
+```json
+{
+    "key": "shift+alt+f",
+    "command": "notebook.formatCell",
+    "when": "editorHasDocumentFormattingProvider && editorTextFocus && inCompositeEditor && notebookEditable && !editorReadonly && activeEditor == 'workbench.editor.notebook'",
+}
+```
+that you can modify if you don't like this combination. This will format the
+current cell with the default formatter. I did not find a way to run isort
+though. There is a "format notebook on save" option, but it's not exactly what
+ we configured for python files. That would run isort + glo-black.
+
 
 Features
 --------
