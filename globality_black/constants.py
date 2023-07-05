@@ -1,4 +1,5 @@
 from enum import Enum, unique
+from pathlib import Path
 
 
 @unique
@@ -26,3 +27,5 @@ NUM_FILES_TO_ENABLE_PARALLELIZATION = 5
 TAB_CHAR_SIZE = 4
 ALL_DONE_STRING = "All done! ✨ 🍰 ✨"
 OH_NO_STRING = "Oh no! 💥 💔 💥"
+
+STDIN_PATH = Path("-")
