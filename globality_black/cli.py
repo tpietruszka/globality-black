@@ -61,12 +61,9 @@ def main(src, check: bool, diff: bool, verbose: bool):
         If --diff, do not modify the files and display the changes induced by reformatting
 
     """
+    messages_to_stderr = True  # consistent with black
     path = Path(src)
     assert path.exists() or path == STDIN_PATH, f"Path {path} does not exist"
-
-    # if we are reading from stdin, we should print system messages to stderr,
-    # as stdout is used to print the reformatted code
-    messages_output = sys.stderr if path == STDIN_PATH else sys.stdout
 
     exit_code = 0
     if diff:
@@ -89,34 +86,36 @@ def main(src, check: bool, diff: bool, verbose: bool):
 
     for is_modified, is_failed, message in map_result:  # type: ignore
         if verbose or is_modified or is_failed:
-            click.echo(message, file=messages_output)
+            click.echo(message, err=messages_to_stderr)
         reformatted_count += is_modified
         failed_count += is_failed
 
     unchanged_count = len(paths) - reformatted_count - failed_count
 
     # add a separator line
-    click.echo("-" * len(OH_NO_STRING), file=messages_output)
+    click.echo("-" * len(OH_NO_STRING), err=messages_to_stderr)
 
     # if we are just checking and at least one file needs to be reformatted OR some file failed
     if (check and reformatted_count > 0) or failed_count > 0:
-        click.echo(OH_NO_STRING, file=messages_output)
+        click.echo(OH_NO_STRING, err=messages_to_stderr)
         exit_code = 1
         if failed_count > 0:
-            click.echo(f"{failed_count} files failed to parse (black error)", file=messages_output)
+            click.echo(
+                f"{failed_count} files failed to parse (black error)", err=messages_to_stderr
+            )
     else:
-        click.echo(ALL_DONE_STRING, file=messages_output)
+        click.echo(ALL_DONE_STRING, err=messages_to_stderr)
 
     if check:
         if reformatted_count > 0:
-            click.echo(f"{reformatted_count} files would be reformatted", file=messages_output)
+            click.echo(f"{reformatted_count} files would be reformatted", err=messages_to_stderr)
         if unchanged_count > 0:
-            click.echo(f"{unchanged_count} files would be left unchanged", file=messages_output)
+            click.echo(f"{unchanged_count} files would be left unchanged", err=messages_to_stderr)
     else:
         if reformatted_count > 0:
-            click.echo(f"{reformatted_count} files reformatted", file=messages_output)
+            click.echo(f"{reformatted_count} files reformatted", err=messages_to_stderr)
         if unchanged_count > 0:
-            click.echo(f"{unchanged_count} files unchanged", file=messages_output)
+            click.echo(f"{unchanged_count} files unchanged", err=messages_to_stderr)
 
     sys.exit(exit_code)
 

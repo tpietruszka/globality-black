@@ -3,7 +3,7 @@ import shutil
 import tempfile
 from enum import Enum, unique
 from pathlib import Path
-from typing import Tuple
+from typing import Optional, Tuple, Union
 
 import pytest
 from click.testing import CliRunner
@@ -63,42 +63,108 @@ def test_cli_file(
             input_path,
             dict(check=check, verbose=verbose, diff=diff),
         )
+        output_message = result.stderr
         expected_exit_code = 1 if has_errors or check and needs_gb else 0
         assert result.exit_code == expected_exit_code
 
-        emoji = OH_NO_STRING if expected_exit_code == 1 else ALL_DONE_STRING
-
-        input_text = input_path.read_text()
         if has_errors or check:
             expected_text = fixture_input_path.read_text()
         else:
             fixture_output_path = get_fixture_path(file_to_test_cli.replace("input", "output"))
             expected_text = fixture_output_path.read_text()
 
-        _diff = show_diff(input_text, expected_text)  # noqa here to help debug
-        assert input_text == expected_text
+        output_text = input_path.read_text()  # formatted in-place
+        _diff = show_diff(output_text, expected_text)  # noqa here to help debug
+        assert output_text == expected_text
 
         per_file_string, final_count_string = get_strings(check, file_condition)
 
         if diff and needs_gb:
             # check the diff report is correct
             expected_diff_output_path = get_fixture_path(file_to_test_cli.replace("input", "diff"))
-            diff_output = get_diff_report(result.output)
+            diff_output = get_diff_report(output_message)
             expected_text = expected_diff_output_path.read_text()
             # we don't check the whole thing since `temp_path` is random
             _diff = show_diff(diff_output, expected_text)  # noqa here to help debug
             assert expected_text in diff_output
+
+        emoji = OH_NO_STRING if expected_exit_code == 1 else ALL_DONE_STRING
         if verbose or needs_gb:
             pattern = f"{per_file_string} {input_path}.*{emoji}.*1 files {final_count_string}.*"
         else:
             pattern = f".*{emoji}.*1 files {final_count_string}.*"
-        assert re.search(pattern, result.output, flags=re.DOTALL)
+        assert re.search(pattern, output_message, flags=re.DOTALL)
 
 
-def run_globality_black(runner: CliRunner, path: Path, kwargs: dict[str, bool]):
+@pytest.mark.parametrize("check,diff", [(False, False), (True, False), (True, True)])
+@pytest.mark.parametrize("verbose", (False, True))
+@pytest.mark.parametrize("file_condition", tuple(FileCondition))
+def test_cli_stdin(
+    runner: CliRunner,
+    check: bool,
+    verbose: bool,
+    diff: bool,
+    file_condition: FileCondition,
+):
+    """
+    Mirroring the test above, but passing the input via stdin instead of a file
+    """
+
+    file_to_test_cli = SINGLE_FILE_MAP[file_condition]
+    has_errors = file_condition == FileCondition.HAS_ERRORS
+    needs_gb = file_condition == FileCondition.NEEDS_GB
+
+    fixture_input_path = get_fixture_path(file_to_test_cli)
+    code = fixture_input_path.read_text()
+
+    result = run_globality_black(
+        runner,
+        "-",
+        dict(check=check, verbose=verbose, diff=diff),
+        input=code,
+    )
+    output_code = result.stdout
+    output_message = result.stderr
+
+    expected_exit_code = 1 if has_errors or check and needs_gb else 0
+    assert result.exit_code == expected_exit_code
+
+    if has_errors or check:
+        expected_text = ""
+    else:
+        fixture_output_path = get_fixture_path(file_to_test_cli.replace("input", "output"))
+        expected_text = fixture_output_path.read_text()
+
+    assert output_code == expected_text
+
+    per_file_string, final_count_string = get_strings(check, file_condition)
+
+    if diff and needs_gb:
+        # check the diff report is correct
+        expected_diff_output_path = get_fixture_path(file_to_test_cli.replace("input", "diff"))
+        diff_output = get_diff_report(output_message)
+        expected_text = expected_diff_output_path.read_text()
+        # we don't check the whole thing since `temp_path` is random
+        _diff = show_diff(diff_output, expected_text)  # noqa here to help debug
+        assert expected_text in diff_output
+
+    emoji = OH_NO_STRING if expected_exit_code == 1 else ALL_DONE_STRING
+    if verbose or needs_gb:
+        pattern = f"{per_file_string}.*{emoji}.*1 files {final_count_string}.*"
+    else:
+        pattern = f".*{emoji}.*1 files {final_count_string}.*"
+    assert re.search(pattern, output_message, flags=re.DOTALL)
+
+
+def run_globality_black(
+    runner: CliRunner,
+    path: Union[Path, str],
+    kwargs: dict[str, bool],
+    input: Optional[str] = None,
+):
     args = [str(path)]
 
-    for arg in ("check", "verbose", "diff", "code"):
+    for arg in ("check", "verbose", "diff"):
         if kwargs.get(arg, False):
             args.append(f"--{arg}")
 
@@ -107,6 +173,7 @@ def run_globality_black(runner: CliRunner, path: Path, kwargs: dict[str, bool]):
         command_name="globality-black",
         command=main,
         args=args,
+        input=input,
     )
     return result
 
@@ -204,7 +271,7 @@ def test_cli_directory(runner: CliRunner, check: bool, error: bool, verbose: boo
             pre_string, _ = get_strings(check, condition)
             # only check if verbose=True or something needed for this file
             if verbose or pre_string != "Nothing to do for":
-                assert f"{pre_string} {filename_in_temp}" in result.output
+                assert f"{pre_string} {filename_in_temp}" in result.stderr
 
         # check for the end of the message
 
@@ -218,4 +285,4 @@ def test_cli_directory(runner: CliRunner, check: bool, error: bool, verbose: boo
             final_string = "\n1 files failed to parse (black error)" + final_string
         final_string = emojis + final_string
 
-        assert result.output.endswith(final_string)
+        assert result.stderr.endswith(final_string)

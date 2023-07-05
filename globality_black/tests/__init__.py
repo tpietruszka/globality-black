@@ -1,6 +1,6 @@
 import difflib
 import logging
-from typing import Sequence
+from typing import Optional, Sequence
 
 import click
 from click.testing import CliRunner, Result
@@ -36,7 +36,8 @@ def run_and_check(
     command_name: str,
     command: click.Command,
     args: Sequence[str],
+    input: Optional[str],
 ) -> Result:
     logging.info(f"Running command: {command_name} {' '.join(args)}")
-    result = runner.invoke(command, args)
+    result = runner.invoke(command, args, input=input)
     return result

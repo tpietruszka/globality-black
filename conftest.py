@@ -4,4 +4,4 @@ from click.testing import CliRunner
 
 @pytest.fixture
 def runner():
-    return CliRunner()
+    return CliRunner(mix_stderr=False)
