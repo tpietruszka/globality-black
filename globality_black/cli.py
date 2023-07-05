@@ -159,7 +159,8 @@ def process_src(
     if not check_only_mode and file_mode:
         path.write_text(output_code)  # type: ignore
     if not check_only_mode and not file_mode:
-        click.echo(output_code, file=sys.stdout, nl=False)
+        # input provided via stdin - we print the reformatted code
+        click.echo(output_code, nl=False)
 
     path_str = f" {path}" if file_mode else ""
     if diff_mode:
